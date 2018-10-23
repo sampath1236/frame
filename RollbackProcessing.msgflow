@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmFilter.msgnode="ComIbmFilter.msgnode" xmlns:ComIbmFlowOrder.msgnode="ComIbmFlowOrder.msgnode" xmlns:ComIbmMQOutput.msgnode="ComIbmMQOutput.msgnode" xmlns:DumpMessage.msgflow="DumpMessage.msgflow" xmlns:GeneralFailure.msgflow="GeneralFailure.msgflow" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" xmi:id="EPackage_1"
+    nsURI="RollbackProcessing.msgflow" nsPrefix="RollbackProcessing.msgflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" xmi:id="FCMComposite_1" name="FCMComposite_1">
+    <eAnnotations>
+      <details key="xmi:uuid" value="d2b4cf52-fb00-0000-0080-97ce52ce6a5e"/>
+    </eAnnotations>
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.RollbackFormatter" name="RollbackFormatter" defaultValueLiteral="RollbackProcessing_RollbackFormatter">
+      <eType xmi:type="ecore:EDataType" href="http://www.ibm.com/wbi/2005/eflow#//EsqlModule"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_1" key="RollbackProcessing" bundleName="RollbackProcessing" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_1" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/RollbackProcessing.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_2" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/RollbackProcessing.gif"/>
+    <composition xmi:id="Composition_1">
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="678,527" queueName="Flow_Auditing_Req" transactionMode="no">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_12" string="Flow_Auditing_Req"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="610,464" computeExpression="RollbackProcessing_PrepareAuditingMsg">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_10" string="Prepare Auditing Msg"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="282,111" computeExpression="RollbackProcessing_Post-Formatter" computeMode="destinationAndMessage">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_18" string="Post-Formatter"/>
+      </nodes>
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_14" location="229,211" queueName="Prepare_Notification_Req" transactionMode="no">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_11" string="Prepare_Notification_Req"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_15" location="176,140" computeExpression="RollbackProcessing_PrepareNotificationMsg">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_6" string="Prepare Notification Msg"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFlowOrder.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_16" location="148,92">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_17" key="FlowOrder1" bundleName="RollbackProcessing" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_19" location="687,342" destinationMode="list" transactionMode="no">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_9" string="Out"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_20" location="233,51" computeExpression="RollbackProcessing_Formatter" computeMode="destinationAndMessage">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_7" string="Formatter"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.In" location="0,1">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_22" key="InTerminal.In" bundleName="RollbackProcessing" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="GeneralFailure.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_23" location="792,11">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_3" string="GeneralFailure"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFlowOrder.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="360,167">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_1" string="FlowOrder"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="417,240" filterExpression="esql://routine/#RollbackProcessing_XMLNSC?.Main">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_17" string="XML?"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="456,290" computeExpression="esql://routine/#OutputProcessing_Compute_SetXMLNSCEncoding.Main">
+        <translation xmi:type="utility:ConstantString" string="Set XMLNSC Encoding"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="451,174" filterExpression="RollbackProcessing_DumpRequired">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_2" string="Dump Required?"/>
+      </nodes>
+      <nodes xmi:type="DumpMessage.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_11" location="552,187" computeExpression="Rollback_DumpMessage_Truncate">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_4" string="DumpMessage"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFlowOrder.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="533,342">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_8" string="FlowOrder2"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="575,389" filterExpression="RollbackProcessing_Filter_AuditRequired?">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_14" string="Audit Required?"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_17" location="52,22" filterExpression="RollbackProcessing_NotificationRequired?">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_5" string="Notification Required?"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_39" targetNode="FCMComposite_1_14" sourceNode="FCMComposite_1_15" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_40" targetNode="FCMComposite_1_15" sourceNode="FCMComposite_1_16" sourceTerminalName="OutTerminal.second" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_12" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_20" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_14" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_16" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_16" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_15" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_23" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_19" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_24" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_14" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_28" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.first" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_30" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_32" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_35" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_36" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_41" targetNode="FCMComposite_1_20" sourceNode="FCMComposite_1_16" sourceTerminalName="OutTerminal.first" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_43" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_12" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_48" targetNode="FCMComposite_1_12" sourceNode="FCMComposite_1_20" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.second" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_15" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_17" targetNode="FCMComposite_1_11" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="FCMComposite_1_19" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.first" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_11" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_13" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_18" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_19" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.second" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_20" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_21" targetNode="FCMComposite_1_6" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_42" targetNode="FCMComposite_1_20" sourceNode="FCMComposite_1_17" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_50" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_17" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_49" targetNode="FCMComposite_1_23" sourceNode="FCMComposite_1_17" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_47" targetNode="FCMComposite_1_16" sourceNode="FCMComposite_1_17" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="FCMComposite_1_17" sourceNode="InTerminal.In" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer xmi:id="PropertyOrganizer_1">
+      <propertyDescriptor xmi:id="PropertyDescriptor_1" groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.RollbackFormatter">
+        <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_2" key="Property.RollbackFormatter" bundleName="RollbackProcessing" pluginId="FrameworkMsgFlowsPrj"/>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_1" promotedAttribute="Property.RollbackFormatter" overriddenNodes="FCMComposite_1_20">
+      <overriddenAttribute href="ComIbmCompute.msgnode#Property.computeExpression"/>
+    </attributeLinks>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>

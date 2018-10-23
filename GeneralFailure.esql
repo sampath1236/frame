@@ -1,0 +1,74 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.20															--
+-- Comments			 : Updated by Alaa ahmed on 06/07/2006																	--
+-- ************************************************************************************ --
+CREATE COMPUTE MODULE GeneralFailure_Check_DB_Error
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+SET OutputRoot = InputRoot;
+-- Enter SQL below this line.  SQL above this line might be regenerated, causing any modifications to be lost.
+
+-- Declare current path within the exception list 
+DECLARE Path 		CHARACTER; 
+DECLARE ErrorCode1   	CHARACTER; 
+DECLARE ErrorCode2   	CHARACTER; 
+
+-- Start at first child of exception list 
+SET Path = 'InputExceptionList.*[1]'; 
+
+-- Loop until no more children 
+WHILE EVAL( 'FIELDNAME(' || Path || ') IS NOT NULL' ) DO 
+
+  -- Check if error number is available 
+  IF EVAL( 'FIELDNAME(' || Path || '.Insert[1].Text) IS NOT NULL AND FIELDNAME(' || Path || '.Insert[2].Text) IS NOT NULL' ) THEN 
+    -- Record only the deepest error number 
+    SET ErrorCode1 = EVAL( Path || '.Insert[1].Text' ); 
+    SET ErrorCode2 = EVAL( Path || '.Insert[2].Text' ); 
+
+    IF ((ErrorCode1 = 'HY000') AND ( ErrorCode2 = '25408')) OR
+       ((ErrorCode1 = '08S01') AND ( ErrorCode2 = '3113'))  OR
+       ((ErrorCode1 = 'HY000') AND ( ErrorCode2 = '12545')) OR
+       ((ErrorCode1 = 'HY000') AND ( ErrorCode2 = '3135')) THEN
+       
+    		SET Environment.Variables.HADBErrorFlag = '1'; 
+    		
+    END IF;
+  END IF; 
+
+-- Step to last child of current element (usually a nested exception list 
+SET Path = Path || '.*[<]'; 
+
+END WHILE;
+
+-- SET ErrorCode1 = ExceptionList.RecoverableException.RecoverableException.RecoverableException.RecoverableException.DatabaseException.DatabaseException.Insert[1].Text;
+-- SET ErrorCode2 = ExceptionList.RecoverableException.RecoverableException.RecoverableException.RecoverableException.DatabaseException.DatabaseException.Insert[2].Text;
+
+
+
+RETURN true;
+END;
+
+END MODULE;
+CREATE FILTER MODULE "GeneralFailure_Rollback?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Environment.Variables.Rollback IS NOT NULL AND 
+Environment.Variables.Rollback = 'Y';
+END;
+
+END MODULE;
+
+
+
+
+
+CREATE FILTER MODULE GeneralFailure_Filter_DumpException
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		RETURN 	Environment.Variables.FlowProperties.Dump_Exception_Flg IS NULL OR 
+				Environment.Variables.FlowProperties.Dump_Exception_Flg <> '0';
+	END;
+
+END MODULE;

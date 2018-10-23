@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="ecore.xmi" xmlns:eflow="eflow.xmi" xmlns:utility="eflow_utility.xmi" xmlns:ComIbmMQInput.msgnode="ComIbmMQInput.msgnode" xmlns:GeneralFailure.msgflow="GeneralFailure.msgflow" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmi:id="EPackage_1" nsURI="Frame1/RollbackAudit.msgflow" nsName="Frame1_RollbackAudit.msgflow">
+  <eMetaObjects xmi:type="eflow:FCMComposite" xmi:id="FCMComposite_1">
+    <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_1" key="RollbackAudit" bundleName="RollbackAudit" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_1" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/RollbackAudit.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_2" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/RollbackAudit.gif"/>
+    <eSuper xmi:type="ecore:EClass" href="eflow.xmi#FCMBlock"/>
+    <composition xmi:id="Composition_1">
+      <nodes xmi:type="ComIbmMQInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="66,95" queueName="Rollback_Audit_Req" messageDomainProperty="XML">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_1" string="MQInput"/>
+      </nodes>
+      <nodes xmi:type="GeneralFailure.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="232,35">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_2" string="GeneralFailure"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="154,110" dataSource="ODSDB" computeExpression="RollbackAudit_CallSingleWriteSP">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_3">
+          <string>Call SingleWrite</string>
+        </translation>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_1"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_4"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1"/>
+    </composition>
+    <propertyOrganizer xmi:id="PropertyOrganizer_1"/>
+  </eMetaObjects>
+</ecore:EPackage>

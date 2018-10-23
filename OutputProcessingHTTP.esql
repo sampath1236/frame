@@ -1,0 +1,13 @@
+
+
+CREATE COMPUTE MODULE Reply_Flow_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = CAST(InputRoot.MQMD.MsgId AS BLOB);
+		SET OutputRoot.MQMD = null;
+		RETURN TRUE;
+	END;
+
+
+END MODULE;

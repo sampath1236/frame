@@ -1,0 +1,425 @@
+BROKER SCHEMA Frame2
+
+
+CREATE PROCEDURE getLastExceptionDetail(IN InputTree reference,OUT messageNumber CHARACTER,OUT messageText CHARACTER)	
+   BEGIN
+   	    DECLARE ptrException reference to InputTree.*[1];
+		WHILE lastmove(ptrException) DO
+			IF ptrException.Number is not null THEN
+        		SET messageNumber = ptrException.Number;
+        		SET messageText = ptrException.Text;
+  			END IF;
+			move ptrException lastchild;
+		END WHILE; 
+	END;
+
+CREATE COMPUTE MODULE webservicecall_Prepfailurefault
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+
+		 CALL CopyMessageHeaders();
+
+		 SET Environment.Variables.FailoverTag = '1';
+
+		 SET OutputRoot.XMLNSC.EAIHeader = Environment.Variables.EAIHeader;
+		 
+		 
+		 SET OutputRoot.SOAP=NULL;
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_Get_EAI_ReturnCode
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_PrepaeRequest
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_PopulateLabel
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		 SET OutputLocalEnvironment.Destination.RouterList.DestinationData[1].labelname = 'CallWebservice';
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+
+
+CREATE COMPUTE MODULE webservicecall_RestoreMQMD
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		 CALL CopyMessageHeaders();
+		 
+		 SET OutputRoot.HTTPResponseHeader=NULL;
+		 SET OutputRoot.HTTPRequestHeader=NULL;
+		 
+		 CREATE NEXTSIBLING OF OutputRoot.Properties DOMAIN 'MQMD';
+		 SET OutputRoot.MQMD = Environment.Variables.MQMD;
+		 
+		 SET OutputRoot.XMLNSC.EAIHeader = Environment.Variables.EAIHeader;
+		 		 
+		 -- just to dump the Fault Body in case coming from Fault Terminal
+		 SET OutputRoot.XMLNSC.Fault = InputRoot.SOAP;
+		 
+		 SET Environment.Variables.Fault = InputRoot.SOAP.*:Body.*:Fault;
+		 
+		 DECLARE messageNumber, messageText CHARACTER;
+		 DECLARE ptrException reference to InputExceptionList.*[1];
+		 IF lastmove(ptrException) THEN
+		 	CALL getLastExceptionDetail(InputExceptionList,messageNumber,messageText);
+		 	IF messageNumber IS NOT NULL AND messageNumber IN ('3151','3166') THEN
+				SET Environment.Variables.WSTimeoutTag = '1';
+				SET Environment.Variables.WSTimeoutReq = InputRoot.XMLNSC;
+			END IF;
+		 END IF;
+
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_Restore2
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL CopyEntireMessage();
+		 SET OutputRoot.HTTPResponseHeader=NULL;
+		 CREATE NEXTSIBLING OF OutputRoot.Properties DOMAIN 'MQMD';
+		 SET OutputRoot.MQMD = Environment.Variables.MQMD;
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_RestoreMQMD2
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		 CALL CopyEntireMessage();
+		 
+		 SET OutputRoot.HTTPResponseHeader=NULL;
+		 SET OutputRoot.HTTPRequestHeader=NULL;
+		 
+		 CREATE NEXTSIBLING OF OutputRoot.Properties DOMAIN 'MQMD';
+		 SET OutputRoot.MQMD = Environment.Variables.MQMD;
+		 
+		 SET OutputRoot.XMLNSC.EAIHeader = Environment.Variables.EAIHeader;
+		 
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_RestoreMQMD3
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		 
+		 SET OutputRoot.HTTPResponseHeader=NULL;
+		 
+		 CREATE NEXTSIBLING OF OutputRoot.Properties DOMAIN 'MQMD';
+		 SET OutputRoot.MQMD = Environment.Variables.MQMD;
+		 
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_Save_MQMD_AND_EAIHeader
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+
+		--CALL CopyEntireMessage();
+		SET OutputLocalEnvironment = InputLocalEnvironment;
+		
+		SET Environment.Variables.MQMD 		= 	InputRoot.MQMD;
+		SET Environment.Variables.EAIHeader	=	InputRoot.XMLNSC.EAIHeader;	
+		
+		SET Environment.Variables.WSTimeoutTag = NULL;
+		SET Environment.Variables.WSTimeoutReq = NULL;	
+		SET Environment.Variables.FailoverTag  = NULL;
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_SET_EAIRtrnCd_NULL
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+
+		CALL CopyEntireMessage();
+		
+		-- in some services (T24 called before coming here for example) EAIRtrnCd is not empty so:
+		-- Set EAIRtrnCd to NULL because in Get_EAI_ReturnCode if EAIRtrnCd is not null it will return it as it is
+		-- by this way, Get_EAI_ReturnCode is forced to map the reeturn code.
+		SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = NULL;
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE webservicecall_DumpMessage
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE FILTER MODULE webservicecall_Dump_Required_Filter
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		-- Dump In Msg_Dump_RPLY table
+		SET Environment.Variables.Dump_Msg_Tp = 'RPLY';
+		
+		RETURN 
+		Environment.Variables.FlowProperties.Dump_Flg IS NOT NULL
+		AND UPPER(Environment.Variables.FlowProperties.Dump_Flg) IN ( 'P','A')
+		AND (Environment.Variables.Rollback IS NULL OR Environment.Variables.Rollback <> 'Y')
+		AND Root.MQMD.BackoutCount = 0;
+	END;
+
+END MODULE;
+
+
+CREATE FILTER MODULE webservicecall_Dump_RES_Required_Filter
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		-- Dump In Msg_Dump_REQ table
+		SET Environment.Variables.Dump_Msg_Tp = 'REQ';
+		
+		RETURN 
+		Environment.Variables.FlowProperties.Dump_Flg IS NOT NULL
+		AND UPPER(Environment.Variables.FlowProperties.Dump_Flg) IN ( 'Q','A')
+		AND Root.MQMD.BackoutCount = 0;
+
+	END;
+
+END MODULE;
+
+
+
+CREATE COMPUTE MODULE webservicecall_Compute_Set_General_Error
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

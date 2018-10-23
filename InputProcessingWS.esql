@@ -1,0 +1,42 @@
+
+
+CREATE COMPUTE MODULE InputProcessingWS_to_XMLNSC___MQMD
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.HTTPInputHeader = null;		
+		SET OutputRoot.Properties.MessageFormat = 'XMLNSC';
+		SET OutputRoot.Properties.MessageDomain = 'XMLNSC';
+	
+		CREATE NEXTSIBLING OF OutputRoot.Properties domain 'MQMD';
+		SET OutputRoot.MQMD.MsgType = MQMT_REQUEST;
+		SET OutputRoot.MQMD.Format  = 'MQSTR';		
+		SET OutputRoot.MQMD.MsgId = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier as BLOB);		
+		SET OutputRoot.MQMD.BackoutCount = 0;
+		SET OutputRoot.MQMD.ReplyToQ ='TEST.OUT';
+		SET OutputRoot.MQMD.ReplyToQMgr ='';
+		
+		SET OutputRoot.XMLNSC.TEMP1 = InputRoot.XMLNSC.*[1];  -- Remove Parent
+	
+		SET OutputRoot.XMLNSC.TEMP2.EAIMessage.Body 			= OutputRoot.XMLNSC.TEMP1.Body;
+		SET OutputRoot.XMLNSC.TEMP2.EAIMessage.EAIHeader 	= OutputRoot.XMLNSC.TEMP1.EAIHeader;
+		SET OutputRoot.XMLNSC.TEMP2.EAIMessage.EAIHeader.UsrDfn	= InputRoot.XMLNSC.*.EAIHeader.UsrDfn;
+		SET OutputRoot.XMLNSC.TEMP2.EAIMessage.EAIHeader.CIF      = '10206413';
+		SET OutputRoot.XMLNSC.TEMP2.EAIMessage.EAIHeader.ChnlId      = 'IB';
+		SET OutputRoot.XMLNSC = OutputRoot.XMLNSC.TEMP2;
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

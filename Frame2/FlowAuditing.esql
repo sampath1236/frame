@@ -1,0 +1,267 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.10																--
+-- Implementation ID : 1.6															--
+-- Comments			 : Updated by Alaa ahmed on 12/07/2006																	--
+-- ************************************************************************************ --
+CREATE COMPUTE MODULE FlowAuditing_CallFlowAuditingSP
+
+CREATE FUNCTION Main() RETURNS BOOLEAN
+BEGIN
+--SET  Environment.Variables	=	InputRoot.XMLNSC.EAIMessage;
+
+
+
+DECLARE Msg_Id CHARACTER;
+SET Msg_Id = SUBSTRING(CAST(InputRoot.MQMD.MsgId AS CHAR) FROM 3 FOR 48);
+
+-- Decide Audit Action
+DECLARE Audit_Action CHARACTER;
+
+If Environment.Variables.FlowProperties.Audit_Flg ='1' then 
+	If Environment.Variables.Flow_Tp In ('EAI_REQ', 'EAI_REQ_RPLY') Then
+		Set Audit_Action='1'; -- Insert
+	Else
+		Set Audit_Action='2'; -- Update
+	End If;
+Else 
+	Set Audit_Action='0'; -- None
+End if;
+
+
+CALL Flow_Auditing (Msg_Id,
+				    COALESCE(Trim(Environment.Variables.EAIHeader.ChnlId),''),
+					Audit_Action,
+					Environment.Variables.Flow_Id,
+					COALESCE(Trim(Environment.Variables.EAIHeader.CIF),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.FunctnId),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Put_Tmstmp),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Tmstmp_1 ),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Tmstmp_2 ),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Tmstmp_3 ),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Tmstmp_4 ),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Tmstmp_x),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Amt_1),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Amt_2),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Amt_3),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Amt_4),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.EAIRtrnCd),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Rjctn_Rsn),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Usr_Dt_Tp_1),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Usr_Dt_1),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Usr_Dt_Tp_2),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Usr_Dt_2),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Acct_No_1),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Acct_No_2),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Acct_No_3),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Acct_No_4),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Blnc),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Cry_Cd_1),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Cry_Cd_2),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Usr_Dfn_1),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Usr_Dfn_2),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Usr_Dfn_3),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Usr_Dfn_4),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Usr_Dfn_5),''),
+					COALESCE(Trim(Environment.Variables.AuditVars.Rvrsl_Info),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.RvrslOptn),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.FE_Ref_No),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.Rqstr_Info1),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.Rqstr_Info2),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.Rqstr_Info3),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.Trx_Md),''),
+					COALESCE(Trim(Environment.Variables.FlowProperties.Dbg_Md),''),
+		     		OutputRoot.XMLNSC.Temp.Rtrn_Cd);
+
+
+SET OutputRoot.XMLNSC.Temp.Rtrn_Cd   = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rtrn_Cd),'NULL'),'');  
+IF OutputRoot.XMLNSC.Temp.Rtrn_Cd ='999998' THEN
+	SET OutputRoot.XMLNSC.Exception = 300/0; /* to cause an exception */
+END IF;
+
+SET OutputRoot.XMLNSC.Temp 			       = NULL;
+
+
+RETURN true;
+END;
+create procedure Flow_Auditing (IN Msg_Id			CHARACTER,
+								IN ChannelID		CHARACTER,
+								IN Audit_Action		CHARACTER,
+								IN Flow_Id			CHARACTER,
+								IN CIFNumber		CHARACTER,
+								IN FunctionID		CHARACTER,
+								IN PutTmstmp		CHARACTER,
+								IN Tmstmp_1			CHARACTER,
+								IN Tmstmp_2			CHARACTER,
+								IN Tmstmp_3			CHARACTER,
+								IN Tmstmp_4			CHARACTER,
+								IN Tmstmp_x			CHARACTER,
+								IN Amt_1			CHARACTER,
+								IN Amt_2			CHARACTER,
+								IN Amt_3			CHARACTER,
+								IN Amt_4			CHARACTER,
+								IN Audit_Rtrn_Cd	CHARACTER,
+								IN Rjctn_Rsn		CHARACTER,
+								IN Usr_Dt_Tp_1		CHARACTER,
+								IN Usr_Dt_1			CHARACTER,
+								IN Usr_Dt_Tp_2		CHARACTER,
+								IN Usr_Dt_2			CHARACTER,
+								IN Acct_No_1		CHARACTER,
+								IN Acct_No_2		CHARACTER,
+								IN Acct_No_3		CHARACTER,
+								IN Acct_No_4		CHARACTER,
+								IN Blnc				CHARACTER,
+								IN Cry_Cd_1			CHARACTER,
+								IN Cry_Cd_2			CHARACTER,
+								IN Audit_Usr_Dfn_1	CHARACTER,
+								IN Audit_Usr_Dfn_2	CHARACTER,
+								IN Audit_Usr_Dfn_3	CHARACTER,
+								IN Audit_Usr_Dfn_4	CHARACTER,
+								IN Audit_Usr_Dfn_5	CHARACTER,
+								IN Rvrsl_Info		CHARACTER,
+								IN RvrslOptn		CHARACTER,
+								IN FE_Ref_No		CHARACTER,
+								IN Rqstr_Info1		CHARACTER,
+								IN Rqstr_Info2		CHARACTER,
+								IN Rqstr_Info3		CHARACTER,
+								IN Trx_Md			CHARACTER,
+								IN Dbg_Md			CHARACTER,
+								OUT Rtrn_Cd			CHARACTER) EXTERNAL NAME "Flow_Auditing";
+
+END MODULE;
+
+CREATE COMPUTE MODULE FlowAuditing_Remove_Special_Characters
+	
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+		Call CopyMessageHeaders();
+		
+		DECLARE Msg BLOB;
+		
+		--To avoid infinte loops, mark the message as recovered
+		SET Environment.Variables.RecoveryRetryCount = 1;	
+		
+		SET Msg = InputRoot.BLOB.BLOB;
+		
+		CALL RemoveSpecialChar(X'00',Msg);
+		CALL RemoveSpecialChar(X'01',Msg);
+		CALL RemoveSpecialChar(X'02',Msg);
+		CALL RemoveSpecialChar(X'03',Msg);
+		CALL RemoveSpecialChar(X'04',Msg);
+		CALL RemoveSpecialChar(X'05',Msg);
+		CALL RemoveSpecialChar(X'06',Msg);
+		CALL RemoveSpecialChar(X'07',Msg);
+		CALL RemoveSpecialChar(X'08',Msg);
+		
+		CALL RemoveSpecialChar(X'0B',Msg);
+		CALL RemoveSpecialChar(X'0C',Msg);
+		CALL RemoveSpecialChar(X'0E',Msg);
+		CALL RemoveSpecialChar(X'0F',Msg);
+		
+		CALL RemoveSpecialChar(X'10',Msg);
+		CALL RemoveSpecialChar(X'11',Msg);
+		CALL RemoveSpecialChar(X'12',Msg);
+		CALL RemoveSpecialChar(X'13',Msg);
+		CALL RemoveSpecialChar(X'14',Msg);
+		CALL RemoveSpecialChar(X'15',Msg);
+		CALL RemoveSpecialChar(X'16',Msg);
+		CALL RemoveSpecialChar(X'17',Msg);
+		CALL RemoveSpecialChar(X'18',Msg);
+		CALL RemoveSpecialChar(X'19',Msg);
+		
+		CALL RemoveSpecialChar(X'1A',Msg);
+		CALL RemoveSpecialChar(X'1B',Msg);
+		CALL RemoveSpecialChar(X'1C',Msg);
+		CALL RemoveSpecialChar(X'1D',Msg);
+		CALL RemoveSpecialChar(X'1E',Msg);
+		CALL RemoveSpecialChar(X'1F',Msg);
+		
+		SET OutputRoot.BLOB.BLOB = Msg;
+		
+		
+		RETURN true;
+END;
+
+CREATE PROCEDURE RemoveSpecialChar(IN SpecialChar BLOB,INOUT Msg BLOB)
+BEGIN
+     DECLARE Pos INTEGER;
+     DECLARE StartPos INTEGER;
+
+     --Find Position of Special Char
+     SET StartPos = POSITION(SpecialChar IN Msg);
+     WHILE (StartPos <> 0) DO
+         --Find the adjacent Special Chars
+         SET Pos = StartPos + 1;
+         WHILE (SUBSTRING(Msg From Pos For 1)=SpecialChar) DO
+             SET Pos = Pos + 1;
+         END WHILE;
+         --Remove All The Adjacent Special Chars 
+         SET Msg = SUBSTRING(Msg From 1 FOR (StartPos-1)) || SUBSTRING(Msg From Pos);
+         --Find Another Group of Special Chars
+         SET StartPos = POSITION(SpecialChar IN Msg);
+     END WHILE;	
+END;
+
+CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+END;
+
+CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+END;
+
+END MODULE;
+
+CREATE FILTER MODULE FlowAuditing_Filter
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		RETURN (COALESCE (Environment.Variables.RecoveryRetryCount,0) < 1);
+	END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE FlowAuditing_Form_Message
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL CopyMessageHeaders();
+		-- CALL CopyEntireMessage();
+		
+		SET Environment.Variables.FlowProperties.Audit_Flg 		= InputRoot.XMLNSC.EAIMessage.FlowProperties.Audit_Flg;
+		SET Environment.Variables.Flow_Tp 						= InputRoot.XMLNSC.EAIMessage.Flow_Tp;
+		SET Environment.Variables.EAIHeader.ChnlId 				= InputRoot.XMLNSC.EAIMessage.EAIHeader.ChnlId;
+		SET Environment.Variables.Flow_Id 						= InputRoot.XMLNSC.EAIMessage.Flow_Id;
+		SET Environment.Variables.EAIHeader.CIF 				= InputRoot.XMLNSC.EAIMessage.EAIHeader.CIF;
+		SET Environment.Variables.EAIHeader.FunctnId 			= InputRoot.XMLNSC.EAIMessage.EAIHeader.FunctnId;
+		SET Environment.Variables.AuditVars 					= InputRoot.XMLNSC.EAIMessage.AuditVars;
+		SET Environment.Variables.EAIHeader.EAIRtrnCd 			= InputRoot.XMLNSC.EAIMessage.EAIHeader.EAIRtrnCd;
+		SET Environment.Variables.EAIHeader.RvrslOptn 			= InputRoot.XMLNSC.EAIMessage.EAIHeader.RvrslOptn;
+		SET Environment.Variables.EAIHeader.FE_Ref_No 			= InputRoot.XMLNSC.EAIMessage.EAIHeader.FE_Ref_No;
+		SET Environment.Variables.EAIHeader.Rqstr_Info1 		= InputRoot.XMLNSC.EAIMessage.EAIHeader.Rqstr_Info1;
+		SET Environment.Variables.EAIHeader.Rqstr_Info2 		= InputRoot.XMLNSC.EAIMessage.EAIHeader.Rqstr_Info2;
+		SET Environment.Variables.EAIHeader.Rqstr_Info3 		= InputRoot.XMLNSC.EAIMessage.EAIHeader.Rqstr_Info3;
+		SET Environment.Variables.EAIHeader.Trx_Md 				= InputRoot.XMLNSC.EAIMessage.EAIHeader.Trx_Md;
+		SET Environment.Variables.FlowProperties.Dbg_Md 		= InputRoot.XMLNSC.EAIMessage.FlowProperties.Dbg_Md;
+
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

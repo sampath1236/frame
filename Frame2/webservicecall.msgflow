@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmFilter.msgnode="ComIbmFilter.msgnode" xmlns:ComIbmFlowOrder.msgnode="ComIbmFlowOrder.msgnode" xmlns:ComIbmTrace.msgnode="ComIbmTrace.msgnode" xmlns:DumpMessage.msgflow="DumpMessage.msgflow" xmlns:Frame2_Get_EAI_ReturnCode.msgflow="Frame2/Get_EAI_ReturnCode.msgflow" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="Frame2/webservicecall.msgflow"
+    nsPrefix="Frame2_webservicecall.msgflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1">
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.Set_EAI_Rtrn_Cd_Paramaters" name="Set_EAI_Rtrn_Cd_Paramaters" defaultValueLiteral="esql://routine/Frame2#webservicecall_Get_EAI_ReturnCode.Main">
+      <eType xmi:type="ecore:EDataType" href="http://www.ibm.com/wbi/2005/eflow#//EsqlModule"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.PrepareWebRequest" name="PrepareWebRequest" defaultValueLiteral="esql://routine/Frame2#webservicecall_PrepaeRequest.Main">
+      <eType xmi:type="ecore:EDataType" href="http://www.ibm.com/wbi/2005/eflow#//EsqlModule"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.Truncate" name="Truncate" defaultValueLiteral="esql://routine/#DumpMessage_Truncate.Main">
+      <eType xmi:type="ecore:EDataType" href="http://www.ibm.com/wbi/2005/eflow#//EsqlModule"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.Set_General_Error" name="Set_General_Error" defaultValueLiteral="esql://routine/Frame2#webservicecall_Compute_Set_General_Error.Main">
+      <eType xmi:type="ecore:EDataType" href="http://www.ibm.com/wbi/2005/eflow#//EsqlModule"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" key="webservicecall" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/webservicecall.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/webservicecall.gif"/>
+    <composition>
+      <nodes xmi:type="ComIbmFlowOrder.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="434,137">
+        <translation xmi:type="utility:ConstantString" string="FlowOrder1"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFlowOrder.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="457,256">
+        <translation xmi:type="utility:ConstantString" string="FlowOrder2"/>
+      </nodes>
+      <nodes xmi:type="Frame2_Get_EAI_ReturnCode.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_13" location="568,265" SetParameters="esql://routine/Frame2#webservicecall_Get_EAI_ReturnCode.Main">
+        <translation xmi:type="utility:ConstantString" string="Get_EAI_ReturnCode"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_15" location="430,35" computeExpression="esql://routine/Frame2#webservicecall_PrepaeRequest.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="PrepareRequest"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input" location="77,35">
+        <translation xmi:type="utility:TranslatableString" key="InTerminal.Input" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input1" location="74,107">
+        <translation xmi:type="utility:TranslatableString" key="InTerminal.Failure" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input2" location="75,177">
+        <translation xmi:type="utility:TranslatableString" key="InTerminal.Fault" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input3" location="66,255">
+        <translation xmi:type="utility:TranslatableString" key="InTerminal.WS_Response" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Output" location="941,-85">
+        <translation xmi:type="utility:TranslatableString" key="OutTerminal.General Failure" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Output1" location="935,260">
+        <translation xmi:type="utility:TranslatableString" key="OutTerminal.Output_Processing" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="308,139" computeExpression="esql://routine/Frame2#webservicecall_RestoreMQMD.Main">
+        <translation xmi:type="utility:ConstantString" string="RestoreMQMD"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="218,255" computeExpression="esql://routine/Frame2#webservicecall_RestoreMQMD2.Main">
+        <translation xmi:type="utility:ConstantString" string="RestoreMQMD"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="748,80" computeExpression="esql://routine/Frame2#webservicecall_RestoreMQMD3.Main">
+        <translation xmi:type="utility:ConstantString" string="RestoreMQMD"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="277,35" computeExpression="esql://routine/Frame2#webservicecall_Save_MQMD_AND_EAIHeader.Main" computeMode="destination">
+        <translation xmi:type="utility:ConstantString" string="Save_MQMD_AND_EAIHeader"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="576,103" computeExpression="esql://routine/Frame2#webservicecall_Prepfailurefault.Main">
+        <translation xmi:type="utility:ConstantString" string="prep_failure_fault"/>
+      </nodes>
+      <nodes xmi:type="ComIbmTrace.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="136,139" destination="file" filePath="/var/mqsi/log/ExceptionList.txt" pattern="Diagnostics from middleware message flow failure&#xD;&#xA;${CURRENT_TIMESTAMP}&#xD;&#xA;${Root}&#xD;&#xA;${DestinationList}&#xD;&#xA;${ExceptionList}&#xD;&#xA;&#xD;&#xA;End of diagnostics &#xD;&#xA;===========================================================================================">
+        <translation xmi:type="utility:ConstantString" string="Trace (Root &amp; ExceptionList)"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFlowOrder.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="592,37">
+        <translation xmi:type="utility:ConstantString" string="flow_order"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Output3" location="945,39">
+        <translation xmi:type="utility:TranslatableString" key="OutTerminal.To_Webservice" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="DumpMessage.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_12" location="951,118" computeExpression="esql://routine/Frame2#webservicecall_DumpMessage.Main">
+        <translation xmi:type="utility:ConstantString" string="DumpMessage"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="826,81" filterExpression="esql://routine/Frame2#webservicecall_Dump_Required_Filter.Main">
+        <translation xmi:type="utility:ConstantString" string="Dump_REQ_Required?"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="821,145" filterExpression="esql://routine/Frame2#webservicecall_Dump_RES_Required_Filter.Main">
+        <translation xmi:type="utility:ConstantString" string="Dump_RES_Required?"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_16" location="713,203" computeExpression="esql://routine/Frame2#webservicecall_Compute_Set_General_Error.Main">
+        <translation xmi:type="utility:ConstantString" string="Set_General_Error"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" targetNode="OutTerminal.Output" sourceNode="FCMComposite_1_7" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_11" targetNode="OutTerminal.Output" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_20" targetNode="FCMComposite_1_4" sourceNode="InTerminal.Input3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_1" sourceNode="InTerminal.Input" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="FCMComposite_1_15" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_14" targetNode="OutTerminal.Output" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_15" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_7" sourceTerminalName="OutTerminal.first" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_6" sourceNode="InTerminal.Input1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_19" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_8" sourceNode="FCMComposite_1_15" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_28" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.second" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_34" targetNode="OutTerminal.Output3" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.first" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_35" targetNode="OutTerminal.Output" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_22" targetNode="FCMComposite_1_13" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.second" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" targetNode="FCMComposite_1_12" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_13" targetNode="FCMComposite_1_11" sourceNode="FCMComposite_1_7" sourceTerminalName="OutTerminal.second" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_23" targetNode="FCMComposite_1_12" sourceNode="FCMComposite_1_11" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_24" targetNode="FCMComposite_1_11" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.first" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_30" targetNode="FCMComposite_1_16" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_32" targetNode="OutTerminal.Output1" sourceNode="FCMComposite_1_13" sourceTerminalName="OutTerminal.Invalid" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_33" targetNode="OutTerminal.Output1" sourceNode="FCMComposite_1_13" sourceTerminalName="OutTerminal.Out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_36" targetNode="OutTerminal.Output1" sourceNode="FCMComposite_1_16" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_17" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_16" targetNode="FCMComposite_1_6" sourceNode="InTerminal.Input2" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer>
+      <propertyDescriptor groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.Set_EAI_Rtrn_Cd_Paramaters">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.Set_EAI_Rtrn_Cd_Paramaters" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+        <propertyDescriptor groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.PrepareWebRequest">
+          <propertyName xmi:type="utility:TranslatableString" key="Property.PrepareWebRequest" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+          <propertyDescriptor groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.Truncate">
+            <propertyName xmi:type="utility:TranslatableString" key="Property.Truncate" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+            <propertyDescriptor groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.Set_General_Error">
+              <propertyName xmi:type="utility:TranslatableString" key="Property.Set_General_Error" bundleName="Frame2/webservicecall" pluginId="Framework_MFPrj"/>
+            </propertyDescriptor>
+          </propertyDescriptor>
+        </propertyDescriptor>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <attributeLinks promotedAttribute="Property.Set_EAI_Rtrn_Cd_Paramaters" overriddenNodes="FCMComposite_1_13">
+      <overriddenAttribute href="Frame2/Get_EAI_ReturnCode.msgflow#Property.SetParameters"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.PrepareWebRequest" overriddenNodes="FCMComposite_1_15">
+      <overriddenAttribute href="ComIbmCompute.msgnode#Property.computeExpression"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.Truncate" overriddenNodes="FCMComposite_1_12">
+      <overriddenAttribute href="DumpMessage.msgflow#Property.computeExpression"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.Set_General_Error" overriddenNodes="FCMComposite_1_16">
+      <overriddenAttribute href="ComIbmCompute.msgnode#Property.computeExpression"/>
+    </attributeLinks>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>

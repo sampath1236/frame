@@ -1,0 +1,162 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 18/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.1.1.1														--
+-- Comments			 : Updated by Alaa ahmed on 18/06/2006																	--
+-- ************************************************************************************ --
+CREATE COMPUTE MODULE RollbackAudit_CallSingleWriteSP
+
+
+CREATE FUNCTION Main() RETURNS BOOLEAN
+BEGIN
+SET  Environment.Variables	=	InputRoot.XMLNSC.EAIMessage;
+
+DECLARE Context_Data_Actn CHARACTER;
+DECLARE Msg_Id CHARACTER;
+SET Msg_Id = SUBSTRING(CAST(InputRoot.MQMD.MsgId AS CHAR) FROM 3 FOR 48);
+
+-- Decide Context Data Action
+If Environment.Variables.Flow_Tp in ('EAI_REQ','EAI_REQ_RPLY') Then
+	Set Context_Data_Actn='0'; -- None
+Else
+	If Environment.Variables.Flow_Tp in ('EAI_INT_REQ','EAI_RPLY') Then
+		Set Context_Data_Actn='3'; -- Delete
+	End If;
+End If;
+
+
+-- Decide Audit Action
+DECLARE Audit_Action CHARACTER;
+
+If Environment.Variables.FlowProperties.Audit_Flg ='1' then 
+	If Environment.Variables.Flow_Tp In ('EAI_REQ', 'EAI_REQ_RPLY') Then
+		Set Audit_Action='1'; -- Insert
+	Else
+		Set Audit_Action='2'; -- Update
+	End If;
+Else 
+	Set Audit_Action='0'; -- None
+End if;
+
+
+CALL Single_Write(	Msg_Id,
+				    Environment.Variables.EAIHeader.ChnlId,
+					Audit_Action,
+					Context_Data_Actn,
+					Environment.Variables.Flow_Id,
+					Environment.Variables.EAIHeader.CIF,
+					Environment.Variables.EAIHeader.FunctnId,
+					Environment.Variables.AuditVars.Put_Tmstmp,
+					Environment.Variables.AuditVars.Tmstmp_1,
+					Environment.Variables.AuditVars.Tmstmp_2,
+					Environment.Variables.AuditVars.Tmstmp_3,
+					Environment.Variables.AuditVars.Tmstmp_4,
+					Environment.Variables.AuditVars.Tmstmp_x,
+					Environment.Variables.AuditVars.Amt_1,
+					Environment.Variables.AuditVars.Amt_2,
+					Environment.Variables.AuditVars.Amt_3,
+					Environment.Variables.AuditVars.Amt_4,
+					Environment.Variables.AuditVars.Audit_Rtrn_Cd,
+					Environment.Variables.AuditVars.Rjctn_Rsn,
+					Environment.Variables.AuditVars.Usr_Dt_Tp_1,
+					Environment.Variables.AuditVars.Usr_Dt_1,
+					Environment.Variables.AuditVars.Usr_Dt_Tp_2,
+					Environment.Variables.AuditVars.Usr_Dt_2,
+					Environment.Variables.AuditVars.Acct_No_1,
+					Environment.Variables.AuditVars.Acct_No_2,
+					Environment.Variables.AuditVars.Acct_No_3,
+					Environment.Variables.AuditVars.Acct_No_4,
+					Environment.Variables.AuditVars.Blnc,
+					Environment.Variables.AuditVars.Cry_Cd_1,
+					Environment.Variables.AuditVars.Cry_Cd_2,
+					Environment.Variables.AuditVars.Audit_Usr_Dfn_1,
+					Environment.Variables.AuditVars.Audit_Usr_Dfn_2,
+					Environment.Variables.AuditVars.Audit_Usr_Dfn_3,
+					Environment.Variables.AuditVars.Audit_Usr_Dfn_4,
+					Environment.Variables.AuditVars.Audit_Usr_Dfn_5,
+					Environment.Variables.AuditVars.Rvrsl_Info,
+					Environment.Variables.EAIHeader.Lang,
+					Environment.Variables.ContextInfo.Rqstr_Info_1,
+					Environment.Variables.ContextInfo.Rqstr_Info_2,
+					Environment.Variables.ContextInfo.Rqstr_Info_3,
+					Environment.Variables.ContextInfo.ReplyToQ,
+					Environment.Variables.ContextInfo.ReplyToQMgr,
+					cast(Environment.Variables.ContextInfo.Encoding as integer),
+					cast(Environment.Variables.ContextInfo.CodedCharSetId as integer),
+					cast(Environment.Variables.ContextInfo.Priority as integer),
+					Environment.Variables.ContextInfo.Usr_Dfn_1,
+					Environment.Variables.ContextInfo.Usr_Dfn_2,
+					Environment.Variables.ContextInfo.Usr_Dfn_3,
+					Environment.Variables.ContextInfo.Usr_Dfn_4,
+					Environment.Variables.ContextInfo.Usr_Dfn_5,
+					Environment.Variables.ContextInfo.Usr_Dfn_6,
+					Environment.Variables.FlowProperties.Dbg_Md,
+		     		OutputRoot.XMLNSC.Temp.Rtrn_Cd);
+
+
+SET OutputRoot.XMLNSC.Temp.Rtrn_Cd   = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rtrn_Cd),'NULL'),'');  
+IF OutputRoot.XMLNSC.Temp.Rtrn_Cd ='9998' THEN
+	SET OutputRoot.XMLNSC.Exception = 300/0; /* to cause an exception */
+END IF;
+
+SET OutputRoot.XMLNSC.Temp 			       = NULL;
+
+
+RETURN true;
+END;
+create procedure Single_Write (	IN Msg_Id			CHARACTER,
+								IN ChannelID		CHARACTER,
+								IN Audit_Action		CHARACTER,
+								IN Context_Data_Actn CHARACTER,
+								IN Flow_Id			CHARACTER,
+								IN CIFNumber		CHARACTER,
+								IN FunctionID		CHARACTER,
+								IN PutTmstmp		CHARACTER,
+								IN Tmstmp_1			CHARACTER,
+								IN Tmstmp_2			CHARACTER,
+								IN Tmstmp_3			CHARACTER,
+								IN Tmstmp_4			CHARACTER,
+								IN Tmstmp_x			CHARACTER,
+								IN Amt_1			CHARACTER,
+								IN Amt_2			CHARACTER,
+								IN Amt_3			CHARACTER,
+								IN Amt_4			CHARACTER,
+								IN Audit_Rtrn_Cd	CHARACTER,
+								IN Rjctn_Rsn		CHARACTER,
+								IN Usr_Dt_Tp_1		CHARACTER,
+								IN Usr_Dt_1			CHARACTER,
+								IN Usr_Dt_Tp_2		CHARACTER,
+								IN Usr_Dt_2			CHARACTER,
+								IN Acct_No_1		CHARACTER,
+								IN Acct_No_2		CHARACTER,
+								IN Acct_No_3		CHARACTER,
+								IN Acct_No_4		CHARACTER,
+								IN Blnc				CHARACTER,
+								IN Cry_Cd_1			CHARACTER,
+								IN Cry_Cd_2			CHARACTER,
+								IN Audit_Usr_Dfn_1	CHARACTER,
+								IN Audit_Usr_Dfn_2	CHARACTER,
+								IN Audit_Usr_Dfn_3	CHARACTER,
+								IN Audit_Usr_Dfn_4	CHARACTER,
+								IN Audit_Usr_Dfn_5	CHARACTER,
+								IN Rvrsl_Info		CHARACTER,
+								IN Lang				CHARACTER,
+								IN Rqstr_Info_1		CHARACTER,
+								IN Rqstr_Info_2		CHARACTER,
+								IN Rqstr_Info_3		CHARACTER,
+								IN ReplyToQ			CHARACTER,
+								IN ReplyToQMgr		CHARACTER,
+								IN Encoding			INTEGER,
+								IN CodedCharSetId	INTEGER,
+								IN Priority			INTEGER,
+								IN Usr_Dfn_1		CHARACTER,
+								IN Usr_Dfn_2		CHARACTER,
+								IN Usr_Dfn_3		CHARACTER,
+								IN Usr_Dfn_4		CHARACTER,
+								IN Usr_Dfn_5		CHARACTER,
+								IN Usr_Dfn_6		CHARACTER,
+								IN Dbg_Md			CHARACTER,
+								OUT Rtrn_Cd			CHARACTER) EXTERNAL NAME "Single_Write";
+
+END MODULE;

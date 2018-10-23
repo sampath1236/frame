@@ -1,0 +1,151 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.9														--
+-- Comments			 : Updated by Alaa ahmed on 16/08/2006																	--
+-- ************************************************************************************ --
+CREATE COMPUTE MODULE "ManageTransaction_Call_ManageTransaction"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+SET OutputRoot = InputRoot;                                                                                                                                    
+                                                                                                                                                               
+DECLARE MSGID  CHARACTER;                                                                                                                                      
+DECLARE Message_Type CHARACTER; -- Temporary variable holding MsgType
+
+If InputRoot.MQMD.Feedback = MQFB_COA THEN
+	SET Environment.Variables.Manage_TRX.Status = 'COAR';
+Else 
+	If InputRoot.MQMD.Feedback = MQFB_COD THEN
+		SET Environment.Variables.Manage_TRX.Status = 'CODR';
+	Else
+		If InputRoot.MQMD.Feedback = MQFB_EXPIRATION THEN
+			SET Environment.Variables.Manage_TRX.Status = 'EXPR';
+		End If;
+	End If;
+End If;
+
+If Environment.Variables.Flow_Tp in ('EAI_REQ','EAI_INT_REQ') THEN
+	SET Message_Type = 'MQMT_REQUEST';
+Else
+	If Environment.Variables.Flow_Tp = 'EAI_RPLY' THEN
+		SET Message_Type = 'MQMT_REPLY';
+		Set Environment.Variables.Manage_TRX.Status = InputRoot.XMLNSC.EAIHeader.EAIRtrnCd;
+	Else
+		If InputRoot.MQMD.MsgType = MQMT_REPORT THEN
+			SET Message_Type = 'MQMT_REPORT';
+		End If;
+	End If;
+End If;
+
+--Set OutputRoot.XMLNSC.Temp.FE_Ref_No 	= COALESCE(Trim(InputRoot.XMLNSC.EAIHeader.FE_Ref_No),'');
+Set OutputRoot.XMLNSC.Temp.FE_Ref_No 	= COALESCE(Trim(Environment.Variables.Manage_TRX.FE_Ref_No),'');
+Set OutputRoot.XMLNSC.Temp.Bulk_Seq 	= COALESCE(Trim(Environment.Variables.Manage_TRX.Bulk_Seq),'');
+Set OutputRoot.XMLNSC.Temp.EAI_Ref_No 	= COALESCE(Trim(Environment.Variables.Manage_TRX.EAI_Ref_No),'');
+Set OutputRoot.XMLNSC.Temp.BE_Ref_No 	= COALESCE(Trim(Environment.Variables.Manage_TRX.BE_Ref_No),'');
+-- Calling SP                                                                                                                                                  
+SET MSGID = SUBSTRING(CAST(OutputRoot.MQMD.MsgId AS CHAR) FROM 3 FOR 48);                                                                                      
+DECLARE C_TIME CHARACTER;
+SET C_TIME = SUBSTRING(CAST(CURRENT_TIMESTAMP AS CHAR) FROM 12);
+SET C_TIME = SUBSTRING(C_TIME from 1 for length(C_TIME)-1);	 
+If Length (C_TIME)>26 Then 
+	Set C_TIME = SUBSTRING(C_TIME from 1 for 26);
+End If;                                                                                                                                               
+CALL MANAGING_TRANSACTION(	MSGID,                                                                                                                 
+					COALESCE(Trim(InputRoot.XMLNSC.EAIHeader.CIF),''),
+					COALESCE(Trim(InputRoot.XMLNSC.EAIHeader.ChnlId),''),	                                               
+					COALESCE(Trim(InputRoot.XMLNSC.EAIHeader.FunctnId),''),                                                                                   
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Acct_No_1),''),   
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Acct_No_2),''),   
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Amt_1),''),       
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Rjctn_Rsn_1),''), 
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Rjctn_Rsn_2),''), 
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Status),''),      
+					Message_Type,                                       
+					OutputRoot.XMLNSC.Temp.FE_Ref_No,   
+					OutputRoot.XMLNSC.Temp.Bulk_Seq,                                           
+					OutputRoot.XMLNSC.Temp.EAI_Ref_No,  
+					OutputRoot.XMLNSC.Temp.BE_Ref_No,                                           
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Rvsl_Flg),''),    
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Rvrsl_Msg_Id),''),
+					COALESCE(Trim(Environment.Variables.Manage_TRX.EAI_Tmstmp),C_TIME),  
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Usr_Dfn_1),''),   
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Usr_Dfn_2),''),   
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Usr_Dfn_3),''),   
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Usr_Dfn_4),''),   
+					COALESCE(Trim(Environment.Variables.Manage_TRX.Usr_Dfn_5),''),   
+					COALESCE(Trim(Environment.Variables.FlowProperties.Dbg_Md),''),                                       
+					OutputRoot.XMLNSC.Temp.EAIRtrnCd,
+					OutputRoot.XMLNSC.Temp.Resubmission_Flg);                                                                                   
+
+
+SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd   = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.EAIRtrnCd),'NULL'),'');                                  
+SET OutputRoot.XMLNSC.Resubmission_Flg		 = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Resubmission_Flg),'NULL'),'');
+--SET OutputRoot.XMLNSC.EAIHeader.FE_Ref_No	 = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.FE_Ref_No),'NULL'),'');\
+SET Environment.Variables.Manage_TRX.FE_Ref_No	 = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.FE_Ref_No),'NULL'),'');
+SET Environment.Variables.Manage_TRX.Bulk_Seq	 = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Bulk_Seq),'NULL'),'');
+SET Environment.Variables.Manage_TRX.EAI_Ref_No	 = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.EAI_Ref_No),'NULL'),'');
+SET Environment.Variables.Manage_TRX.BE_Ref_No	 = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.BE_Ref_No),'NULL'),'');
+
+                                                                                                                                                               
+SET OutputRoot.XMLNSC.Temp 			       = NULL;
+
+RETURN true;
+END;
+CREATE PROCEDURE MANAGING_TRANSACTION (	IN   		Msg_Id				 CHARACTER,
+										IN   		CIF_No               CHARACTER,
+										IN   		Chnl_Id              CHARACTER,
+										IN   		Fun_Id               CHARACTER,
+										IN   		Acct_No_1            CHARACTER,
+										IN   		Acct_No_2            CHARACTER,
+										IN   		Amt_1                CHARACTER,
+										IN   		Rjctn_Rsn_1          CHARACTER,
+										IN   		Rjctn_Rsn_2          CHARACTER,
+										IN   		Status               CHARACTER,
+										IN   		Msg_Tp               CHARACTER,
+										INOUT		FE_Ref_No            CHARACTER,
+										INOUT		Bulk_Seq             CHARACTER,
+										INOUT		EAI_Ref_No           CHARACTER,
+										INOUT		BE_Ref_No            CHARACTER,
+										IN   		Rvrsl_Flg            CHARACTER,
+										IN   		Rvrsl_Msg_Id         CHARACTER,
+										IN   		EAI_Tmstmp           CHARACTER,
+										IN   		Usr_Dfn_1            CHARACTER,
+										IN   		Usr_Dfn_2            CHARACTER,
+										IN   		Usr_Dfn_3            CHARACTER,
+										IN   		Usr_Dfn_4            CHARACTER,
+										IN   		Usr_Dfn_5            CHARACTER,
+										IN   		Dbg_Md               CHARACTER,
+										OUT  		Rtrn_Cd              CHARACTER,
+										OUT  		Resubmission_Flg     CHARACTER) EXTERNAL NAME "MANAGING_TRANSACTION"; 
+                                                                                                                                                               
+END MODULE;
+CREATE FILTER MODULE "ManageTransaction_Status_Success?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Root.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE ManageTransaction_Compute_PreManageTransaction
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

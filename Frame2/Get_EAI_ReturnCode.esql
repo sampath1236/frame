@@ -1,0 +1,312 @@
+
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.20																--
+-- Implementation ID : 1.10															--
+-- Comments			 : Updated by Alaa ahmed on 02/08/2006																	--
+-- ************************************************************************************ --
+
+CREATE FILTER MODULE "Get_EAI_ReturnCode_Filter_Success?"
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		RETURN Root.XMLNSC.EAIHeader.EAIRtrnCd in ('000000','777770','777771','777772');
+	END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE Get_EAI_ReturnCode_Compute_MapReturnCode
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		--- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		Declare E1 Character '';
+		Declare E2 Character '';
+		Declare E3 Character '';
+		Declare E4 Character '';
+		Declare Success Character 'N';
+		If Environment.Variables.MapReturnCode.BE_Rtrn_Cd is null Then
+			If Environment.Variables.MapReturnCode.BE_Cd = 'GL' Then
+				If Environment.Variables.MapReturnCode.Srvc_Tp in ('TRX','NLVLTRX') Then	 -- Transaction
+					If InputRoot.XMLNSC.RplyTrxDetails.SuccessFail = '1' Then
+						If Environment.Variables.MapReturnCode.Srvc_Tp = 'TRX' THEN
+							Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+							Set Success = 'Y';
+						Else
+							IF InputRoot.XMLNSC.MessageData[1].FieldContent = 'INAU' AND (InputRoot.XMLNSC.MessageData[2].FieldContent is null 
+									OR InputRoot.XMLNSC.MessageData[1].FieldContent =  '') THEN 
+								Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '777770';	
+							ElseIF InputRoot.XMLNSC.MessageData[1].FieldContent = 'INAU' AND InputRoot.XMLNSC.MessageData[2].FieldContent is not null 
+									AND InputRoot.XMLNSC.MessageData[1].FieldContent <>  '' THEN 
+								Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '777771';	
+							ElseIF InputRoot.XMLNSC.MessageData[1].FieldContent = 'INAO' THEN
+								Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '777772';
+							ELSE
+								Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+							END IF;
+
+							Set OutputRoot.XMLNSC.EAIHeader.Ovrrd_Clss = COALESCE(InputRoot.XMLNSC.MessageData[2].FieldContent,'');
+							Set Environment.Variables.EAIHeader.Ovrrd_Clss = COALESCE(InputRoot.XMLNSC.MessageData[2].FieldContent,'');
+							Set Success = 'Y';
+						END IF;
+					Else
+						If InputRoot.XMLNSC.RplyTrxDetails.SuccessFail is null Then
+							Set E1 = InputRoot.XMLNSC.RplyTrxDetails.TransactionId;
+						Else	
+							If Environment.Variables.MapReturnCode.ATMNative='Y' Then
+								Set Environment.Variables.Temp[] = (Select MD.FieldContent AS "FieldContent" from InputRoot.XMLNSC.MessageData[] AS "MD" where MD.FieldName = 'Y.ISO.RESPONSE:1:1');
+								Set E1 = substring('Y.ISO.RESPONSE:1:1='|| Environment.Variables.Temp[1].FieldContent from 1 for 60) ;
+							Else
+								
+								Set E1 = substring(InputRoot.XMLNSC.MessageData[1].FieldName ||COALESCE('='||InputRoot.XMLNSC.MessageData[1].FieldContent,'') from 1 for 60); 
+								Set E2 = substring(InputRoot.XMLNSC.MessageData[2].FieldName ||COALESCE('='||InputRoot.XMLNSC.MessageData[2].FieldContent,'') from 1 for 60); 
+								Set E3 = substring(InputRoot.XMLNSC.MessageData[3].FieldName ||COALESCE('='||InputRoot.XMLNSC.MessageData[3].FieldContent,'') from 1 for 60); 
+								Set E4 = substring(InputRoot.XMLNSC.MessageData[4].FieldName ||COALESCE('='||InputRoot.XMLNSC.MessageData[4].FieldContent,'') from 1 for 60); 
+							End If;
+						End If;
+					End If;
+					
+
+					
+				ElseIf Environment.Variables.MapReturnCode.Srvc_Tp = 'INQSclrs'		THEN	-- Inquiry Scalers
+					If InputRoot.XMLNSC.ColumnDetails is not null AND InputRoot.XMLNSC.MessageData is not null Then 
+						SET E1 = substring(InputRoot.XMLNSC.MessageData[1].FieldName ||COALESCE('='||InputRoot.XMLNSC.MessageData[1].FieldContent,'') from 1 for 60); 	
+					ELSEIF InputRoot.XMLNSC.ColumnDetails is null AND InputRoot.XMLNSC.MessageData is null Then 
+						Set E1 = InputRoot.XMLNSC.HeaderCaptionDetails.HeaderCaptionIdentifier;
+					ELSE
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					END IF;
+				ElseIf Environment.Variables.MapReturnCode.Srvc_Tp = 'INQLst'		THEN 	-- Inquiry List
+					If InputRoot.XMLNSC.HeaderCaptionDetails is not null AND InputRoot.XMLNSC.ColumnDetails is null 
+							AND InputRoot.XMLNSC.HeaderCaptionDetails2 is null AND InputRoot.XMLNSC.ReturnedData is null  Then 	-- Error
+						SET E1 = InputRoot.XMLNSC.HeaderCaptionDetails.HeaderCaptionIdentifier;
+					ELSEIF InputRoot.XMLNSC.HeaderCaptionDetails is null AND InputRoot.XMLNSC.HeaderCaptionDetails2 is null 		--,,Error 
+							AND InputRoot.XMLNSC.ColumnDetails is not null AND InputRoot.XMLNSC.ReturnedData is null Then 
+						SET E1 = InputRoot.XMLNSC.ColumnDetails.ColumnIdentifier;	
+					ELSE 
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					END IF;
+				ElseIf Environment.Variables.MapReturnCode.Srvc_Tp = 'INQLstSnglHdr'		THEN 	-- Inquiry List Single Header
+					If InputRoot.XMLNSC.HeaderCaptionDetails.HeaderCaptionIdentifier is not null AND InputRoot.XMLNSC.ColumnDetails[1].ColumnIdentifier is null 
+							AND InputRoot.XMLNSC.ReturnedData[1].RowValueColumn[1] is null  Then 	-- Error
+						SET E1 = InputRoot.XMLNSC.HeaderCaptionDetails.HeaderCaptionIdentifier;
+					ELSEIF InputRoot.XMLNSC.HeaderCaptionDetails.HeaderCaptionIdentifier is null AND InputRoot.XMLNSC.ColumnDetails[1].ColumnIdentifier is not null 
+							AND InputRoot.XMLNSC.ReturnedData[1].RowValueColumn[1] is null Then    	--,,Error 
+						SET E1 = InputRoot.XMLNSC.ColumnDetails.ColumnIdentifier;	
+					ELSEIF  InputRoot.XMLNSC.HeaderCaptionDetails.HeaderCaptionIdentifier is null AND InputRoot.XMLNSC.ColumnDetails[1].ColumnIdentifier is not null 
+							--AND InputRoot.XMLNSC.ReturnedData is not null 
+							AND CARDINALITY (InputRoot.XMLNSC.ReturnedData.RowValueColumn[]) = 1 Then    --,,Error 
+						SET E1 = InputRoot.XMLNSC.ReturnedData[1].RowValueColumn[1];	
+					ELSE		
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					END IF;
+				Else 																		-- Inquiry
+					If InputRoot.XMLNSC.ColumnDetails is not null Then 
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					Else
+						Set E1 = InputRoot.XMLNSC.HeaderCaptionDetails.HeaderCaptionIdentifier;
+					End If;
+				End If;	
+			ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'MFA' Then
+					IF InputRoot.XMLNSC.Response = 'False' THEN
+						Set E1 = InputRoot.XMLNSC.Exception.ErrorCode;
+						Set Success = 'N';
+					ELSE
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					End If;	
+			
+			ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'SIMAH' THEN
+
+					IF UPPER(Environment.Variables.STATUS) = 'PARSER' THEN
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '300002'; --Simah parser exception
+						Set Success = 'Y';
+					END IF;	
+				    IF UPPER(Environment.Variables.STATUS) = 'OK' THEN							
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+				    END IF;	
+			ELSEIF 	Environment.Variables.MapReturnCode.BE_Cd = 'MBSHRB' THEN
+				IF InputRoot.XMLNSC.StatusCode ='OK' THEN
+					Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+					Set Success = 'Y';
+				ELSE
+					Set E1 = SUBSTRING(InputRoot.XMLNSC.StatusDetail from 1 for 60); 
+					Set Success = 'N';
+						
+				END IF;		
+			
+			ELSEIF 	Environment.Variables.MapReturnCode.BE_Cd = 'Siebel' THEN	
+				IF InputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000' THEN
+					Set Success = 'Y';
+				ELSE
+					Set E1 = SUBSTRING(InputRoot.XMLNSC.EAIHeader.EAIRtrnCd from 1 for 60); 
+					Set Success = 'N';
+				END IF;	
+								
+			End If;
+			
+		Else
+			if Environment.Variables.MapReturnCode.BE_Rtrn_Cd in ('0', '0000', '000000') then
+				Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+				Set Success = 'Y';
+			else
+				If Environment.Variables.MapReturnCode.BE_Cd = 'SADAD' Then
+					If Environment.Variables.MapReturnCode.BE_Rtrn_Cd = '0' Then
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					Else
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					End If;
+				ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'CMS' Then
+					If Environment.Variables.MapReturnCode.BE_Rtrn_Cd = '0000' OR Environment.Variables.MapReturnCode.BE_Rtrn_Cd = '000' Then
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					Else
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					End If;
+				ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'B24' Then
+					If Environment.Variables.MapReturnCode.BE_Rtrn_Cd = '0000' Then
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					Else
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					End If;
+				ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'TTP' Then
+					If Environment.Variables.MapReturnCode.BE_Rtrn_Cd = '000000' Then
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					Else
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					End If;
+		
+				ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'CB' Then
+					If Environment.Variables.MapReturnCode.BE_Rtrn_Cd = '1'  OR Environment.Variables.MapReturnCode.BE_Rtrn_Cd = 'SUCCESS' Then
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					Else
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					End If;	
+		
+						
+				ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'GL' Then
+					If Environment.Variables.MapReturnCode.BE_Rtrn_Cd = '000000' Then
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					Else
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					End If;
+				ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'SHRPNT' Then
+					If Environment.Variables.MapReturnCode.BE_Rtrn_Cd = '000' Then
+						Set OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						Set Success = 'Y';
+					Else
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					End If;
+				
+				ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'SIMAH' THEN
+						IF UPPER(Environment.Variables.STATUS) = 'ERROR' THEN							
+							set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+							Set Success = 'N';	
+					    END IF;	
+				ElseIf Environment.Variables.MapReturnCode.BE_Cd = 'SIGCAP' Then					
+					 Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;	
+				
+					    		
+				ELSEIF Environment.Variables.MapReturnCode.BE_Cd = 'MBSHR' THEN 
+					IF Environment.Variables.MapReturnCode.BE_Rtrn_Cd = '0' THEN
+						SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						SET Success = 'Y';
+					ELSE
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					END IF;		
+					
+				ELSEIF  Environment.Variables.MapReturnCode.BE_Cd = 'WU' THEN
+					Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd; 
+					Set Success = 'N';
+					
+				ELSEIF Environment.Variables.MapReturnCode.BE_Cd = 'AMLCK' THEN 
+					IF Environment.Variables.MapReturnCode.BE_Rtrn_Cd IN('0','1') THEN
+						SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						SET Success = 'Y';
+					ELSE
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					END IF;	
+				ELSEIF Environment.Variables.MapReturnCode.BE_Cd = 'ELM' THEN 
+					IF Environment.Variables.MapReturnCode.BE_Rtrn_Cd = 'Success' THEN
+						SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd = '000000';
+						SET Success = 'Y';
+					ELSE
+						Set E1 = Environment.Variables.MapReturnCode.BE_Rtrn_Cd;
+					END IF;	
+					
+					
+					
+				End If;
+					
+			end if;
+		End If;
+		
+		
+		
+		IF Success ='N' THEN
+			SET OutputRoot.XMLNSC.Temp[]				= PASSTHRU('SELECT Get_EAI_ReturnCode (?,?,?,?,?,?,?,?) "RtrnCd" FROM DUAL',InputRoot.MQMD.MsgId,E1,Environment.Variables.MapReturnCode.BE_Cd,Environment.Variables.EAIHeader.FunctnId,E2,E3,E4,COALESCE(Trim(Environment.Variables.FlowProperties.Dbg_Md),'')); 
+			SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd 	= COALESCE(NULLIF(Trim( OutputRoot.XMLNSC.Temp.RtrnCd),'NULL'),'');
+			SET OutputRoot.XMLNSC.Temp					= NULL;
+		END IF;
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE FILTER MODULE Get_EAI_ReturnCode_Filter
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		RETURN Root.XMLNSC.EAIHeader.EAIRtrnCd is not NULL 
+			AND Root.XMLNSC.EAIHeader.EAIRtrnCd <> '';
+	END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE Get_EAI_ReturnCode_Compute_SetParameters
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

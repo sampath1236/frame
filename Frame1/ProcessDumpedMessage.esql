@@ -1,0 +1,120 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 18/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.3															--
+-- Comments			 : Updated by Ahmed Shabaan on 28/08/2006																--
+-- ************************************************************************************ --
+CREATE COMPUTE MODULE ProcessDumpedMessage_SetExpiry
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+SET OutputRoot = InputRoot;
+SET OutputRoot.MQMD.Expiry = 72000;
+
+RETURN true;
+END;
+
+END MODULE;
+CREATE COMPUTE MODULE ProcessDumpedMessage_DumpToDB
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+CALL CopyMessageHeaders();
+-- CALL CopyEntireMessage();
+Set OutputRoot.XMLNSC.Msg_Data 		= InputRoot.XMLNSC.DumpMessage.Msg_Data;
+Set Environment.Variables.InputData = BITSTREAM(OutputRoot.XMLNSC);
+Set OutputRoot.XMLNSC 					= InputRoot.XMLNSC;
+
+DECLARE Msg_Id CHARACTER;
+SET Msg_Id = SUBSTRING(CAST(InputRoot.MQMD.MsgId AS CHAR) FROM 3 FOR 48);
+
+IF InputRoot.XMLNSC.DumpMessage.Dump_Msg_Tp = 'REQ' THEN
+
+
+
+/*
+		PASSTHRU ('INSERT INTO EAI_MESSAGE_DUMP_REQUEST (EMDR_MSG_ID, EMDR_FLOW_ID, EMDR_CREATION_TMSTMP , EMDR_CIF, EMDR_MSG_DATA, EMDR_BRKR_NAME)
+					VALUES (''' || Msg_Id ||''',''' || InputRoot.XMLNSC.DumpMessage.Flow_Id ||''', ''' || InputRoot.XMLNSC.DumpMessage.TimeStamp || ''', ''' || InputRoot.XMLNSC.DumpMessage.CIF_No ||''', ?, ''' || SUBSTRING(InputRoot.MQMD.ReplyToQMgr FROM 1 FOR 24) ||''')', 
+						Environment.Variables.InputData); 
+
+
+		PASSTHRU ('INSERT INTO EAI_MESSAGE_DUMP_REQUEST (EMDR_MSG_ID, EMDR_FLOW_ID, EMDR_CREATION_TMSTMP , EMDR_CIF, EMDR_MSG_DATA, EMDR_BRKR_NAME)
+					VALUES (?,?, to_timestamp(''' || InputRoot.XMLNSC.DumpMessage.TimeStamp || ''', ''YYYY-MM-DD HH24:MI:SS:FF6''), ?, ?, ?)', 
+						Msg_Id,
+				   		InputRoot.XMLNSC.DumpMessage.Flow_Id, 
+						InputRoot.XMLNSC.DumpMessage.CIF_No,
+						Environment.Variables.InputData,
+						SUBSTRING(InputRoot.MQMD.ReplyToQMgr FROM 1 FOR 24)); 
+		
+	*/	
+		
+		PASSTHRU ('INSERT INTO EAI_MESSAGE_DUMP_REQUEST (EMDR_MSG_ID, EMDR_FLOW_ID, EMDR_CREATION_TMSTMP , EMDR_CIF, EMDR_MSG_DATA, EMDR_BRKR_NAME) VALUES (?,?,?,?,?,?)',
+				Msg_Id,
+			   	InputRoot.XMLNSC.DumpMessage.Flow_Id, 
+				InputRoot.XMLNSC.DumpMessage.TimeStamp,
+				InputRoot.XMLNSC.DumpMessage.CIF_No,
+				Environment.Variables.InputData,
+				SUBSTRING(InputRoot.MQMD.ReplyToQMgr FROM 1 FOR 24)); 
+				
+	
+
+Else
+	IF InputRoot.XMLNSC.DumpMessage.Dump_Msg_Tp = 'RPLY' THEN
+
+/*
+		PASSTHRU ('INSERT INTO EAI_MESSAGE_DUMP_REPLY (EMDR_MSG_ID, EMDR_FLOW_ID, EMDR_CREATION_TMSTMP , EMDR_CIF, EMDR_MSG_DATA, EMDR_BRKR_NAME)
+					VALUES (''' || Msg_Id ||''',''' || InputRoot.XMLNSC.DumpMessage.Flow_Id ||''', ''' || InputRoot.XMLNSC.DumpMessage.TimeStamp || ''', ''' || InputRoot.XMLNSC.DumpMessage.CIF_No ||''', ?, ''' || SUBSTRING(InputRoot.MQMD.ReplyToQMgr FROM 1 FOR 24) ||''')', 
+						Environment.Variables.InputData); 
+
+
+		PASSTHRU ('INSERT INTO EAI_MESSAGE_DUMP_REPLY (EMDR_MSG_ID, EMDR_FLOW_ID, EMDR_CREATION_TMSTMP , EMDR_CIF, EMDR_MSG_DATA, EMDR_BRKR_NAME)
+				VALUES (?,?, to_timestamp(''' || InputRoot.XMLNSC.DumpMessage.TimeStamp || ''', ''YYYY-MM-DD HH24:MI:SS:FF6''), ?, ?, ?)', 
+					Msg_Id,
+			   		InputRoot.XMLNSC.DumpMessage.Flow_Id, 
+					InputRoot.XMLNSC.DumpMessage.CIF_No,
+					Environment.Variables.InputData,
+					SUBSTRING(InputRoot.MQMD.ReplyToQMgr FROM 1 FOR 24)); 
+
+*/
+
+
+
+
+	PASSTHRU ('INSERT INTO EAI_MESSAGE_DUMP_REPLY (EMDR_MSG_ID, EMDR_FLOW_ID, EMDR_CREATION_TMSTMP, EMDR_CIF, EMDR_MSG_DATA, EMDR_BRKR_NAME) VALUES (?,?,?,?,?,?)',
+			Msg_Id,
+			InputRoot.XMLNSC.DumpMessage.Flow_Id,
+			InputRoot.XMLNSC.DumpMessage.TimeStamp ,
+			InputRoot.XMLNSC.DumpMessage.CIF_No,
+			Environment.Variables.InputData,
+			SUBSTRING(InputRoot.MQMD.ReplyToQMgr FROM 1 FOR 24)); 
+
+
+			
+/*CALL TEST_TIMESTAMP_FORMAT(		
+						Msg_Id,
+			          	InputRoot.XMLNSC.DumpMessage.Flow_Id,
+		         	    InputRoot.XMLNSC.DumpMessage.TimeStamp ,
+						InputRoot.XMLNSC.DumpMessage.CIF_No
+						);*/
+	END IF;
+END IF;
+RETURN true;
+END;
+
+CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+CREATE PROCEDURE CopyEntireMessage() BEGIN
+	SET OutputRoot = InputRoot;
+END;
+	
+/*create procedure TEST_TIMESTAMP_FORMAT(	IN  Msg_Id 						CHARACTER,
+								IN  Flow_Id 					CHARACTER,
+								IN  CREATION_TIMESTAMP 					CHARACTER,
+								IN  CIF_NO 					CHARACTER
+						) EXTERNAL NAME "TEST_TIMESTAMP_FORMAT";
+*/
+END MODULE;

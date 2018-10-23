@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="ecore.xmi" xmlns:eflow="eflow.xmi" xmlns:utility="eflow_utility.xmi" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmFilter.msgnode="ComIbmFilter.msgnode" xmlns:ComIbmThrow.msgnode="ComIbmThrow.msgnode" xmlns:ComIbmTrace.msgnode="ComIbmTrace.msgnode" xmi:id="EPackage_1" nsURI="GeneralFailure.msgflow" nsName="GeneralFailure.msgflow">
+  <eMetaObjects xmi:type="eflow:FCMComposite" xmi:id="FCMComposite_1" xmi:uuid="4046e3fb-e400-0000-0080-a0778862a9a6">
+    <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_1" key="GeneralFailure" bundleName="GeneralFailure" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_1" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/GeneralFailure.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_2" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/GeneralFailure.gif"/>
+    <eSuper xmi:type="ecore:EClass" href="eflow.xmi#FCMBlock"/>
+    <composition xmi:id="Composition_1">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="106,27" computeExpression="GeneralFailure_Check_DB_Error">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_3">
+          <string>Check DB Error</string>
+        </translation>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="219,29" filterExpression="GeneralFailure_Rollback?">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_1" string="Rollback?"/>
+      </nodes>
+      <nodes xmi:type="ComIbmThrow.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="451,18" messageNumber="3005">
+        <messageText>MQSI flow failure occured. Check MQSI log.</messageText>
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_4" bundleName="GeneralFailure" pluginId="Framework_MFPrj">
+          <key>Goto Catch Error</key>
+        </translation>
+      </nodes>
+      <nodes xmi:type="ComIbmTrace.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="363,166" destination="file" filePath="/var/mqsi/log/ExceptionList.txt">
+        <pattern>Diagnostics from middleware message flow failure
+${CURRENT_TIMESTAMP}
+${Root}
+${DestinationList}
+${ExceptionList}
+
+End of diagnostics 
+===========================================================================================
+
+</pattern>
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_5" bundleName="GeneralFailure" pluginId="Framework_MFPrj">
+          <key>Trace (Root &amp; ExceptionList)</key>
+        </translation>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.In" location="35,27">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_3" key="InTerminal.In" bundleName="GeneralFailure" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="309,92" filterExpression="GeneralFailure_Filter_DumpException">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_2">
+          <string>Dump Exception</string>
+        </translation>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_1" sourceNode="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_2"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_2"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_2"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_4"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_2"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_5"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_5"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_11" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_5"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_5"/>
+    </composition>
+    <propertyOrganizer xmi:id="PropertyOrganizer_1"/>
+  </eMetaObjects>
+</ecore:EPackage>

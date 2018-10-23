@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmFilter.msgnode="ComIbmFilter.msgnode" xmlns:GeneralFailure.msgflow="GeneralFailure.msgflow" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" xmi:id="EPackage_1"
+    nsURI="ManageTransaction.msgflow" nsPrefix="ManageTransaction.msgflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" xmi:id="FCMComposite_1" name="FCMComposite_1">
+    <eAnnotations>
+      <details key="xmi:uuid" value="5025cab4-fb00-0000-0080-82ac93392bf1"/>
+    </eAnnotations>
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.computeExpression" name="computeExpression" defaultValueLiteral="ManageTransaction_Compute_PreManageTransaction">
+      <eType xmi:type="ecore:EDataType" href="http://www.ibm.com/wbi/2005/eflow#//EsqlModule"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_1" key="ManageTransaction" bundleName="ManageTransaction" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_1" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/ManageTransaction.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_2" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/ManageTransaction.gif"/>
+    <composition xmi:id="Composition_1">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="124,76" dataSource="ODSDB" computeExpression="ManageTransaction_Call_ManageTransaction">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_2" string="Call Manage Transaction"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="259,86" filterExpression="ManageTransaction_Status_Success?">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_3" key="Success?" bundleName="ManageTransaction" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Invalid" location="361,91">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_8" key="OutTerminal.Invalid" bundleName="ManageTransaction" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Out" location="352,181">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_9" key="OutTerminal.Out" bundleName="ManageTransaction" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.In" location="8,5">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_7" key="InTerminal.In" bundleName="ManageTransaction" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="GeneralFailure.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_4" location="364,23">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_1" string="GeneralFailure"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="48,35" computeExpression="ManageTransaction_Compute_PreManageTransaction">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_3" string="Pre-Manage Transaction"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="OutTerminal.Out" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="OutTerminal.Invalid" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_3" sourceNode="InTerminal.In" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer xmi:id="PropertyOrganizer_1">
+      <propertyDescriptor groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.computeExpression">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.computeExpression" bundleName="ComIbmCompute" pluginId="com.ibm.etools.mft.ibmnodes"/>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <attributeLinks promotedAttribute="Property.computeExpression" overriddenNodes="FCMComposite_1_3">
+      <overriddenAttribute href="ComIbmCompute.msgnode#Property.computeExpression"/>
+    </attributeLinks>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>

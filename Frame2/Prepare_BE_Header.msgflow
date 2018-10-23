@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="ecore.xmi" xmlns:eflow="eflow.xmi" xmlns:utility="eflow_utility.xmi" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:GeneralFailure.msgflow="GeneralFailure.msgflow" xmi:id="EPackage_1" nsURI="Frame2/Prepare_BE_Header.msgflow" nsName="Frame2_Prepare_BE_Header.msgflow">
+  <eMetaObjects xmi:type="eflow:FCMComposite" xmi:id="FCMComposite_1">
+    <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_1" key="Prepare_BE_Header" bundleName="Prepare_BE_Header" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_1" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/Prepare_BE_Header.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_2" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/Prepare_BE_Header.gif"/>
+    <eSuper xmi:type="ecore:EClass" href="eflow.xmi#FCMBlock"/>
+    <composition xmi:id="Composition_1">
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.In" location="70,181">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_2" key="InTerminal.In" bundleName="Prepare_BE_Header" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Out" location="253,226">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_3" key="OutTerminal.Out" bundleName="Prepare_BE_Header" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="144,188" computeExpression="Prepare_BE_Header_Compute_PrepareHeader">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_1">
+          <string>Prepare Header</string>
+        </translation>
+      </nodes>
+      <nodes xmi:type="GeneralFailure.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_2" location="235,140">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_2" string="GeneralFailure"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_1" sourceNode="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="OutTerminal.Out" sourceNode="FCMComposite_1_1"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1"/>
+    </composition>
+    <propertyOrganizer xmi:id="PropertyOrganizer_1"/>
+  </eMetaObjects>
+</ecore:EPackage>

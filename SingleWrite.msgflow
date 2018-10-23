@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="ecore.xmi" xmlns:eflow="eflow.xmi" xmlns:utility="eflow_utility.xmi" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:GeneralFailure.msgflow="GeneralFailure.msgflow" xmlns:ComIbmFilter.msgnode="ComIbmFilter.msgnode" xmi:id="EPackage_1" nsURI="SingleWrite.msgflow" nsName="SingleWrite.msgflow">
+  <eMetaObjects xmi:type="eflow:FCMComposite" xmi:id="FCMComposite_1" xmi:uuid="a75b42dc-fa00-0000-0080-97ce52ce6a5e">
+    <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_1" key="SingleWrite" bundleName="SingleWrite" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_1" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/SingleWrite.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_2" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/SingleWrite.gif"/>
+    <eSuper xmi:type="ecore:EClass" href="eflow.xmi#FCMBlock"/>
+    <eAttributes xmi:id="Property.SetOutputAuditingParameters" name="SetOutputAuditingParameters" eDefaultValue="SingleWrite_SetOutputAuditingParameters">
+      <eTypeClassifier xmi:type="ecore:EDataType" href="eflow.xmi#EsqlModule"/>
+      <eMultiplicity xmi:id="EMultiplicity_3" lower="0" upper="1"/>
+    </eAttributes>
+    <composition xmi:id="Composition_1">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="76,34" computeExpression="SingleWrite_SetOutputAuditingProperties">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_4">
+          <string>Set Auditing Parameters</string>
+        </translation>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="255,105" dataSource="ODSDB" computeExpression="SingleWrite_CallSingleWriteSP">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_3">
+          <string>Call Single Write</string>
+        </translation>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Out" location="405,204">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_2" key="OutTerminal.Out" bundleName="SingleWrite" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.In" location="23,33">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_5" key="InTerminal.In" bundleName="SingleWrite" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="GeneralFailure.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_5" location="404,30">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_2" string="GeneralFailure"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="175,77">
+        <filterExpression>SingleWrite_Filter_By Pass SW?</filterExpression>
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_5">
+          <string>By Pass SW?</string>
+        </translation>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="OutTerminal.Out" sourceNode="FCMComposite_1_3"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_2" sourceNode="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_3"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_2"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_2"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_1"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_1"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in" targetNode="OutTerminal.Out" sourceNode="FCMComposite_1_1"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1"/>
+    </composition>
+    <propertyOrganizer xmi:id="PropertyOrganizer_5">
+      <propertyDescriptor xmi:id="PropertyDescriptor_3" groupName="Group.Group1" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.SetOutputAuditingParameters">
+        <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_6" key="Property.SetOutputAuditingParameters" bundleName="SingleWrite" pluginId="FrameworkMsgFlowsPrj"/>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_3" overriddenNodes="FCMComposite_1_2" promotedAttribute="Property.SetOutputAuditingParameters">
+      <overriddenAttribute href="ComIbmCompute.msgnode#Property.computeExpression"/>
+    </attributeLinks>
+  </eMetaObjects>
+</ecore:EPackage>

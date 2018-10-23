@@ -1,0 +1,114 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.6														--
+-- Comments			 : Updated by Moustapha Abdel Aziz on 16/08/2006																	--
+-- ************************************************************************************ --
+--CREATE COMPUTE MODULE SingleWrite_SetOutputAuditingProperties
+--CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+--SET OutputRoot = InputRoot;
+--
+--RETURN true;
+--END;
+--
+--END MODULE;
+
+CREATE COMPUTE MODULE SingleWrite_CallSingleWriteSP
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+SET OutputRoot = InputRoot;
+
+DECLARE Context_Data_Actn CHARACTER;
+DECLARE Msg_Id CHARACTER;
+SET Msg_Id = SUBSTRING(CAST(OutputRoot.MQMD.MsgId AS CHAR) FROM 3 FOR 48);
+
+-- Decide Context Data Action
+Set Context_Data_Actn = '0';
+If Environment.Variables.Flow_Tp = 'EAI_REQ'  Then
+		Set Context_Data_Actn='1'; -- Insert
+Else
+	If Environment.Variables.Flow_Tp = 'EAI_INT_REQ' Then
+		Set Context_Data_Actn='2'; -- Update
+	Else
+		If Environment.Variables.Flow_Tp = 'EAI_RPLY' Then
+			Set Context_Data_Actn='3'; -- Delete
+		End If;
+	End If;
+End If;
+
+-- Currently single write handles context only
+If Context_Data_Actn <> '0'  Then
+CALL Single_Write(	Msg_Id,
+				    COALESCE(Trim(Environment.Variables.EAIHeader.ChnlId),''),
+					Context_Data_Actn,
+					COALESCE(Trim(Environment.Variables.EAIHeader.CIF),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.FunctnId),''),
+					COALESCE(Trim(Environment.Variables.EAIHeader.Lang),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.Rqstr_Info_1),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.Rqstr_Info_2),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.Rqstr_Info_3),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.Rqstr_Info_4),''),
+					'',--COALESCE(Trim(Environment.Variables.ContextInfo.Trx_Md),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.ReplyToQ),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.ReplyToQMgr),''),
+					CAST(COALESCE(Environment.Variables.ContextInfo.Encoding,'') AS CHARACTER),
+					CAST(COALESCE(Environment.Variables.ContextInfo.CodedCharSetId,'') AS CHARACTER),
+					CAST(COALESCE(Environment.Variables.ContextInfo.Priority,'') AS CHARACTER),
+					COALESCE(Trim(Environment.Variables.ContextInfo.Usr_Dfn_1),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.Usr_Dfn_2),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.Usr_Dfn_3),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.Usr_Dfn_4),''),
+					COALESCE(Trim(Environment.Variables.ContextInfo.Usr_Dfn_5),''),
+--					COALESCE(Trim(Environment.Variables.ContextInfo.Usr_Dfn_6),''),
+					COALESCE((Environment.Variables.ContextInfo.Usr_Dfn_6),''),
+					COALESCE(Trim(Environment.Variables.FlowProperties.Dbg_Md),''),
+		     		OutputRoot.XMLNSC.Temp.Rtrn_Cd);
+
+End If;
+SET OutputRoot.XMLNSC.Temp.Rtrn_Cd   = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rtrn_Cd),'NULL'),'');  
+IF OutputRoot.XMLNSC.Temp.Rtrn_Cd ='999998' THEN
+	SET OutputRoot.XMLNSC.Exception = 300/0; /* to cause an exception */
+END IF;
+
+SET OutputRoot.XMLNSC.Temp 			       = NULL;
+
+
+RETURN true;
+END;
+create procedure Single_Write (	IN Msg_Id			CHARACTER,
+								IN ChannelID		CHARACTER,
+								IN Context_Data_Actn CHARACTER,
+								IN CIFNumber		CHARACTER,
+								IN FunctionID		CHARACTER,
+								IN Lang				CHARACTER,
+								IN Rqstr_Info_1		CHARACTER,
+								IN Rqstr_Info_2		CHARACTER,
+								IN Rqstr_Info_3		CHARACTER,
+								IN Rqstr_Info_4		CHARACTER,
+								IN Trx_Md			CHARACTER,
+								IN ReplyToQ			CHARACTER,
+								IN ReplyToQMgr		CHARACTER,
+								IN Encoding			CHARACTER,
+								IN CodedCharSetId	CHARACTER,
+								IN Priority			CHARACTER,
+								IN Usr_Dfn_1		CHARACTER,
+								IN Usr_Dfn_2		CHARACTER,
+								IN Usr_Dfn_3		CHARACTER,
+								IN Usr_Dfn_4		CHARACTER,
+								IN Usr_Dfn_5		CHARACTER,
+								IN Usr_Dfn_6		CHARACTER,
+								IN Dbg_Md			CHARACTER,
+								OUT Rtrn_Cd			CHARACTER) EXTERNAL NAME "Single_Write";
+END MODULE;
+
+
+
+
+CREATE FILTER MODULE "SingleWrite_Filter_By Pass SW?"
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		RETURN 	Environment.Variables.ByPassSW IS NOT NULL AND
+				Environment.Variables.ByPassSW='Y';
+	END;
+
+END MODULE;

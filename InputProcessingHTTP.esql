@@ -1,0 +1,16 @@
+
+
+CREATE COMPUTE MODULE Request_Flow_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET OutputRoot.HTTPInputHeader = null;
+		CREATE NEXTSIBLING OF OutputRoot.Properties domain 'MQMD';
+		SET OutputRoot.MQMD.MsgType = MQMT_REPLY;
+		SET OutputRoot.MQMD.StrucId = MQMD_STRUC_ID;
+		SET OutputRoot.MQMD.Version = MQMD_CURRENT_VERSION;
+		SET OutputRoot.MQMD.MsgId = CAST(InputLocalEnvironment.Destination.HTTP.RequestIdentifier as BLOB);
+		SET OutputRoot.MQMD.BackoutCount = 0;
+		RETURN TRUE;
+	END;
+END MODULE;

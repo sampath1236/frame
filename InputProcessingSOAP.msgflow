@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmFilter.msgnode="ComIbmFilter.msgnode" xmlns:ComIbmFlowOrder.msgnode="ComIbmFlowOrder.msgnode" xmlns:DumpMessage.msgflow="DumpMessage.msgflow" xmlns:FunctionAuthorization.msgflow="FunctionAuthorization.msgflow" xmlns:GeneralFailure.msgflow="GeneralFailure.msgflow" xmlns:SingleRead.msgflow="SingleRead.msgflow" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow"
+    xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" xmi:id="EPackage_1"
+    nsURI="InputProcessingSOAP.msgflow" nsPrefix="InputProcessingSOAP.msgflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" xmi:id="FCMComposite_1" name="FCMComposite_1">
+    <eAnnotations>
+      <details key="xmi:uuid" value="7fdace52-fb00-0000-0080-97ce52ce6a5e"/>
+    </eAnnotations>
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.Truncate" name="Truncate" defaultValueLiteral="esql://routine/#InputProcessingSOAP_DumpMessage_Truncate.Main">
+      <eType xmi:type="ecore:EDataType" href="http://www.ibm.com/wbi/2005/eflow#//EsqlModule"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.SetInputAuditingParameters" name="SetInputAuditingParameters" defaultValueLiteral="esql://routine/#InputProcessingSOAP_SetInputAuditProperties.Main">
+      <eType xmi:type="ecore:EDataType" href="http://www.ibm.com/wbi/2005/eflow#//EsqlModule"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_1" key="InputProcessingSOAP" bundleName="InputProcessingSOAP" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_1" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/InputProcessingSOAP.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_2" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/InputProcessingSOAP.gif"/>
+    <composition xmi:id="Composition_1">
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="483,269" filterExpression="esql://routine/#InputProcessingSOAP_ByPassSR?.Main">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_11" key="By Pass SR?" bundleName="InputProcessingSOAP" pluginId="Framework_MFPrj"/>
+        <shortDescription xmi:type="utility:ConstantString" xmi:id="ConstantString_22" string="Is the message a Confirmation Of Delivery?"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Invalid" location="793,384">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_4" key="OutTerminal.Invalid" bundleName="InputProcessingSOAP" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Out" location="797,531">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_5" key="OutTerminal.Out" bundleName="InputProcessingSOAP" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_14" location="570,360" filterExpression="esql://routine/#InputProcessingSOAP_FunctionAuthorizationRequired?.Main">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_12" string="Function Authorization Required?"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_16" location="229,45" computeExpression="esql://routine/#InputProcessingSOAP_BLOBToXMLNSC.Main">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_21" key="BLOB To XML" bundleName="InputProcessingSOAP" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_19" location="322,192" computeExpression="InputProcessing_SetInputAuditProperties">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_2" string="Set Auditing Parameters"/>
+      </nodes>
+      <nodes xmi:type="FunctionAuthorization.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="693,400">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_13" string="FunctionAuthorization"/>
+      </nodes>
+      <nodes xmi:type="GeneralFailure.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_9" location="779,2">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_18" string="GeneralFailure"/>
+      </nodes>
+      <nodes xmi:type="SingleRead.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_11" location="563,274">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_19" string="SingleRead"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFlowOrder.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="632,274">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_20" string="FlowOrder"/>
+      </nodes>
+      <nodes xmi:type="DumpMessage.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_15" location="763,312" computeExpression="esql://routine/#InputProcessing_DumpMessage_Truncate.Main">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_11" string="DumpMessage"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="435,239" computeExpression="esql://routine/#InputProcessingSOAP_Compute_Caching.Main">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_1" string="Caching"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="691,281" filterExpression="esql://routine/#InputProcessingSOAP_DumpRequired.Main">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_6" string="Dump Required?"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input" location="-66,15">
+        <translation xmi:type="utility:TranslatableString" key="InTerminal.Input" bundleName="InputProcessingSOAP" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="78,30" computeExpression="esql://routine/#InputProcessingSOAP_Remove_NameSpace_Compute.Main">
+        <translation xmi:type="utility:ConstantString" string="Remove NameSpace"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="0,15" computeExpression="esql://routine/#InputProcessingSOAP_SetMsgId_Compute.Main">
+        <translation xmi:type="utility:ConstantString" string="SetMsgId"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_27" targetNode="FCMComposite_1_14" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_29" targetNode="OutTerminal.Out" sourceNode="FCMComposite_1_14" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" targetNode="OutTerminal.Invalid" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.Invalid" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="OutTerminal.Out" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.Valid" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_14" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_54" targetNode="FCMComposite_1_11" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_56" targetNode="FCMComposite_1_12" sourceNode="FCMComposite_1_11" sourceTerminalName="OutTerminal.Out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_57" targetNode="FCMComposite_1_14" sourceNode="FCMComposite_1_12" sourceTerminalName="OutTerminal.first" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_60" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_12" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_61" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_14" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_62" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_14" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_63" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_64" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_70" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_19" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_72" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_16" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_19" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_8" sourceNode="FCMComposite_1_12" sourceTerminalName="OutTerminal.second" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_15" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_16" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_17" targetNode="FCMComposite_1_15" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_23" targetNode="FCMComposite_1_19" sourceNode="FCMComposite_1_16" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_16" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="FCMComposite_1_4" sourceNode="InTerminal.Input" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer xmi:id="PropertyOrganizer_1">
+      <propertyDescriptor groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.Truncate">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.Truncate" bundleName="InputProcessingSOAP" pluginId="Framework_MFPrj"/>
+        <propertyDescriptor groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.SetInputAuditingParameters">
+          <propertyName xmi:type="utility:TranslatableString" key="Property.SetInputAuditingParameters" bundleName="InputProcessingSOAP" pluginId="Framework_MFPrj"/>
+        </propertyDescriptor>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <attributeLinks promotedAttribute="Property.Truncate" overriddenNodes="FCMComposite_1_15">
+      <overriddenAttribute href="DumpMessage.msgflow#Property.computeExpression"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.SetInputAuditingParameters" overriddenNodes="FCMComposite_1_19">
+      <overriddenAttribute href="ComIbmCompute.msgnode#Property.computeExpression"/>
+    </attributeLinks>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>

@@ -1,0 +1,44 @@
+
+
+DECLARE CacheParamTable SHARED ROW;
+CREATE COMPUTE MODULE CashParameters_CashParam
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		-- CALL CopyEntireMessage();
+		
+		SET OutputLocalEnvironment = InputLocalEnvironment;
+		
+		PARAM : BEGIN ATOMIC -- beginning of atomic block. Processing is single threaded until the END; is reached
+			IF CacheParamTable.{Environment.Variables.Flow_Id}.valid IS NULL THEN
+		 		SET  CacheParamTable.{Environment.Variables.Flow_Id}.ParamData[] =  
+		       	(
+		       		SELECT P.EP_PARAM_NAME,P.EP_PARAM_VALUE
+		       		FROM Database.EAI_PARAM as P,Database.EAI_FLOW_PARAM as FP 
+		       		WHERE 
+		       			P.EP_PARAM_ID = FP.EFP_PARAM_ID
+		       			AND FP.EFP_FLOW_ID  = Environment.Variables.Flow_Id		         			
+		       	 ); 
+		         	 
+			SET CacheParamTable.{Environment.Variables.Flow_Id}.valid = true;
+			END IF;
+			END PARAM ;
+		SET Environment.Variables.Cash.Param[] = CacheParamTable.{Environment.Variables.Flow_Id}.ParamData[];
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

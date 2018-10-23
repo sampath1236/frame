@@ -1,0 +1,48 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 18/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.6															--
+-- Comments			 : 																--
+-- ************************************************************************************ --
+
+CREATE COMPUTE MODULE Prepare_BE_Header_Compute_PrepareHeader
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		If Environment.Variables.BE_Cd = 'GLS' Then -- Globus 
+			DECLARE C_TIME CHARACTER;
+			Set C_TIME = SUBSTRING(CAST(CURRENT_TIMESTAMP AS CHAR) FROM 12);
+			Set OutputRoot.XMLNSC.GL_Req_Header.Chnl_Id 		= InputRoot.XMLNSC.EAIHeader.ChnlId;
+			Set OutputRoot.XMLNSC.GL_Req_Header.CIF_No			= InputRoot.XMLNSC.EAIHeader.CIF;
+			Set OutputRoot.XMLNSC.GL_Req_Header.EAI_Ref_No 	= Environment.Variables.Manage_TRX. EAI_Ref_No;
+			Set OutputRoot.XMLNSC.GL_Req_Header.EAI_Tmstmp 	= SUBSTRING(C_TIME from 1 for length(C_TIME)-1);
+			Set OutputRoot.XMLNSC.GL_Req_Header.GL_Fun_Id 		= InputRoot.XMLNSC.EAIHeader.FunctnId;
+			Set OutputRoot.XMLNSC.GL_Req_Header.Rev_Flg 		= InputRoot.XMLNSC.EAIHeader.RvrslOptn;
+			Set OutputRoot.XMLNSC.GL_Req_Header.Trx_Md 	 	= InputRoot.XMLNSC.EAIHeader.Trx_Md;
+			Set OutputRoot.XMLNSC.GL_Req_Header.Rqstr_Info1 	= InputRoot.XMLNSC.EAIHeader.Rqstr_Info1;
+			Set OutputRoot.XMLNSC.GL_Req_Header.Rqstr_Info2 	= InputRoot.XMLNSC.EAIHeader.Rqstr_Info2;
+			Set OutputRoot.XMLNSC.GL_Req_Header.Rqstr_Info3 	= InputRoot.XMLNSC.EAIHeader.Rqstr_Info3;
+			Set OutputRoot.XMLNSC.GL_Req_Header.Rqstr_Info4 	= InputRoot.XMLNSC.EAIHeader.Rqstr_Info4;
+			Set OutputRoot.XMLNSC.GL_Req_Header.ReplyToQ 		= Environment.Variables.SuccessMsgProperties.Default_ReplyToQ;
+			Set OutputRoot.XMLNSC.GL_Req_Header.ReplyToQMgr 	= '';
+			Set OutputRoot.XMLNSC.GL_Req_Header.Msg_Id 		= InputRoot.MQMD.MsgId;
+			
+		End If;
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

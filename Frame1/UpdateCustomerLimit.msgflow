@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="ecore.xmi" xmlns:eflow="eflow.xmi" xmlns:utility="eflow_utility.xmi" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:GeneralFailure.msgflow="GeneralFailure.msgflow" xmlns:ComIbmFilter.msgnode="ComIbmFilter.msgnode" xmi:id="EPackage_1" nsURI="Frame1/UpdateCustomerLimit.msgflow" nsName="Frame1_UpdateCustomerLimit.msgflow">
+  <eMetaObjects xmi:type="eflow:FCMComposite" xmi:id="FCMComposite_1" xmi:uuid="d7b64ed4-fb00-0000-0080-82ac93392bf1">
+    <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_1" key="UpdateCustomerLimit" bundleName="UpdateCustomerLimit" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_1" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/UpdateCustomerLimit.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_2" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/UpdateCustomerLimit.gif"/>
+    <eSuper xmi:type="ecore:EClass" href="eflow.xmi#FCMBlock"/>
+    <eAttributes xmi:id="Property.PreUpdateCustomerLimit" name="PreUpdateCustomerLimit" eDefaultValue="UpdateCustomerLimit_PreUpdateCustomerLimit">
+      <eTypeClassifier xmi:type="ecore:EDataType" href="eflow.xmi#EsqlModule"/>
+      <eMultiplicity xmi:id="EMultiplicity_1" lower="0" upper="1"/>
+    </eAttributes>
+    <composition xmi:id="Composition_1">
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Valid" location="349,230">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_2" key="OutTerminal.Valid" bundleName="UpdateCustomerLimit" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.In" location="27,21">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_3" key="InTerminal.In" bundleName="UpdateCustomerLimit" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="155,79" dataSource="ODSDB" computeExpression="UpdateCustomerLimit_CallUpdateCustomerLimitSP">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_1">
+          <string>Call UpdateCustomerLimit</string>
+        </translation>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Invalid" location="343,133">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_4" key="OutTerminal.Invalid" bundleName="UpdateCustomerLimit" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="81,21" computeExpression="UpdateCustomerLimit_Compute_PreUpdateCustomerLimit">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_2" string="Pre-UpdateCustomerLimit"/>
+      </nodes>
+      <nodes xmi:type="GeneralFailure.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_2" location="370,18">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_3" string="GeneralFailure"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="264,128" filterExpression="UpdateCustomerLimit_Success?">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_4" string="Success?"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_1" sourceNode="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_1"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_5"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_5"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in" targetNode="OutTerminal.Valid" sourceNode="FCMComposite_1_3"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in" targetNode="OutTerminal.Invalid" sourceNode="FCMComposite_1_3"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_3"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.In" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_3"/>
+    </composition>
+    <propertyOrganizer xmi:id="PropertyOrganizer_1">
+      <propertyDescriptor xmi:id="PropertyDescriptor_1" groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.PreUpdateCustomerLimit">
+        <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_5" key="Property.PreUpdateCustomerLimit" bundleName="UpdateCustomerLimit" pluginId="FrameworkMsgFlowsPrj"/>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_1" overriddenNodes="FCMComposite_1_1" promotedAttribute="Property.PreUpdateCustomerLimit">
+      <overriddenAttribute href="ComIbmCompute.msgnode#Property.computeExpression"/>
+    </attributeLinks>
+  </eMetaObjects>
+</ecore:EPackage>

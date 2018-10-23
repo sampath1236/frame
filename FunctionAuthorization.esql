@@ -1,0 +1,96 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.01																--
+-- Implementation ID : 1.11															--
+-- Comments			 : Updated by Alaa ahmed on 05/08/2006																	--
+-- ************************************************************************************ --
+CREATE COMPUTE MODULE "FunctionAuthorization_CallSP"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+SET OutputRoot 					= InputRoot;
+Set OutputRoot.XMLNSC.FunAuthVars 	= NULL;
+DECLARE MsgId 	CHARACTER;
+If InputRoot.XMLNSC.EAIHeader.ChnlId = 'ATM' Then
+	Set Environment.Variables.FunAuthVars.Usr_Dfn_1  =  InputRoot.XMLNSC.EAIHeader.Rqstr_Info2;
+End If;
+SET OutputRoot.XMLNSC.Temp.Acct_Tp 	= COALESCE(Trim(Environment.Variables.FunAuthVars.Acct_Tp),'');
+SET OutputRoot.XMLNSC.Temp.Acct_Tp_2 	= COALESCE(Trim(Environment.Variables.FunAuthVars.Acct_Tp_2),'');
+SET OutputRoot.XMLNSC.Temp.Cry_Id 		= COALESCE(Trim(Environment.Variables.FunAuthVars.Cry_Id),'');
+SET OutputRoot.XMLNSC.Temp.Cry_Id_2 	= COALESCE(Trim(Environment.Variables.FunAuthVars.Cry_Id_2),'');
+SET OutputRoot.XMLNSC.Temp.Usr_Dfn_1 	= COALESCE(Trim(Environment.Variables.FunAuthVars.Usr_Dfn_1),'');
+SET OutputRoot.XMLNSC.Temp.Usr_Dfn_2 	= COALESCE(Trim(Environment.Variables.FunAuthVars.Usr_Dfn_2),'');
+
+SET MsgId = SUBSTRING(CAST(OutputRoot.MQMD.MsgId AS CHAR) FROM 3 FOR 48);
+-- Calling SP
+CALL Function_Authorization	( 	MsgId,
+								COALESCE(Trim(Environment.Variables.EAIHeader.CIF),''),
+								COALESCE(Trim(Environment.Variables.EAIHeader.ChnlId),''),
+								Environment.Variables.Flow_Id,
+								COALESCE(Trim(Environment.Variables.EAIHeader.FunctnId),''),
+								COALESCE(Trim(Environment.Variables.FunAuthVars.Fun_Md),''),
+								COALESCE(Trim(Environment.Variables.FunAuthVars.Trx_Amt),''),
+								OutputRoot.XMLNSC.Temp.Cry_Id,
+								OutputRoot.XMLNSC.Temp.Acct_Tp,
+								COALESCE(Trim(Environment.Variables.FunAuthVars.Acct_No),''),
+								COALESCE(Trim(Environment.Variables.FunAuthVars.Card_Tp),''),
+								COALESCE(Trim(Environment.Variables.FunAuthVars.Card_No),''),
+								COALESCE(Trim(Environment.Variables.FunAuthVars.Trx_Amt_2),''),
+								OutputRoot.XMLNSC.Temp.Cry_Id_2,
+								OutputRoot.XMLNSC.Temp.Acct_Tp_2,
+								COALESCE(Trim(Environment.Variables.FunAuthVars.Acct_No_2),''),
+								COALESCE(Trim(Environment.Variables.FunAuthVars.Card_Tp_2),''),
+								COALESCE(Trim(Environment.Variables.FunAuthVars.Card_No_2),''),
+								OutputRoot.XMLNSC.Temp.Usr_Dfn_1,
+								OutputRoot.XMLNSC.Temp.Usr_Dfn_2,
+								COALESCE(Trim(Environment.Variables.FlowProperties.Dbg_Md),''),
+								OutputRoot.XMLNSC.Temp.Rtrn_Cd);
+
+-- Extract data
+SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd  = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rtrn_Cd),'NULL'),'');  
+SET Environment.Variables.Cry_Id   		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Cry_Id),'NULL'),'');  
+SET Environment.Variables.Cry_Id_2   	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Cry_Id_2),'NULL'),'');  
+SET Environment.Variables.Acct_Tp   	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Acct_Tp),'NULL'),'');  
+SET Environment.Variables.Acct_Tp_2   	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Acct_Tp_2),'NULL'),'');  
+SET Environment.Variables.Usr_Dfn_1 	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Usr_Dfn_1),'NULL'),'');  
+SET Environment.Variables.Usr_Dfn_2 	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Usr_Dfn_2),'NULL'),'');  
+SET OutputRoot.XMLNSC.Temp=NULL;
+If InputRoot.XMLNSC.EAIHeader.ChnlId = 'ATM' Then
+	Set OutputRoot.XMLNSC.EAIHeader.CIF  			=  Environment.Variables.Usr_Dfn_1;
+	Set Environment.Variables.EAIHeader.CIF  	=  Environment.Variables.Usr_Dfn_1;
+End If;
+RETURN true;
+END;
+create procedure Function_Authorization	(	IN 		Msg_Id 		CHARACTER,
+											IN 		CIF_No 		CHARACTER,
+											IN 		Chnl_Id 	CHARACTER,
+											IN 		Flow_Id		CHARACTER,
+											IN 		Fun_Id 		CHARACTER,
+											IN 		Fun_Md 		CHARACTER,
+											IN 		Trx_Amt 	CHARACTER,
+											INOUT	Cry_Id 		CHARACTER,
+											INOUT 	Acct_Tp 	CHARACTER,
+											IN 		Acct_No 	CHARACTER,
+											IN 		Card_Tp 	CHARACTER,
+											IN 		Card_No 	CHARACTER,
+											IN 		Trx_Amt_2 	CHARACTER,
+											INOUT	Cry_Id_2 	CHARACTER,
+											INOUT 	Acct_Tp_2 	CHARACTER,
+											IN 		Acct_No_2 	CHARACTER,
+											IN 		Card_Tp_2 	CHARACTER,
+											IN 		Card_No_2 	CHARACTER,
+											INOUT	Usr_Dfn_1	CHARACTER,
+											INOUT	Usr_Dfn_2	CHARACTER,
+											IN 		Dbg_Md	 	CHARACTER,
+											OUT 	Rtrn_Cd 	CHARACTER) EXTERNAL NAME "Function_Authorization";
+
+
+END MODULE;
+
+
+CREATE FILTER MODULE "FunctionAuthorization_Success"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Body.EAIHeader.EAIRtrnCd = '000000';
+END;
+
+END MODULE;

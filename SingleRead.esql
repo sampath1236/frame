@@ -1,0 +1,283 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.10																--
+-- Implementation ID : 1.8														--
+-- Comments			 : Updated by Moustapha Abdel Aziz on 16/08/2006																	--
+-- ************************************************************************************ --
+CREATE COMPUTE MODULE "SingleRead_CallSingleReadSP"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+SET OutputRoot = InputRoot;
+
+
+DECLARE Msg_Id CHARACTER;
+DECLARE Context_Data_Actn CHARACTER;
+SET Msg_Id = SUBSTRING(CAST(OutputRoot.MQMD.MsgId AS CHAR) FROM 3 FOR 48);
+-- Decide Context Data Action
+If Environment.Variables.Flow_Tp in ( 'EAI_REQ', 'EAI_REQ_RPLY') Then
+	Set Context_Data_Actn='0'; -- None
+Else
+	If Environment.Variables.Flow_Tp = 'EAI_INT_REQ' Then
+		Set Context_Data_Actn='1'; -- Read
+	Else
+		Set Context_Data_Actn='2'; -- Read and delete
+	End If;
+End If;
+
+CALL Single_Read(		Msg_Id,
+			          	Environment.Variables.Flow_Id,
+		         	    COALESCE(Trim(Environment.Variables.EAIHeader.ChnlId),''),
+						COALESCE(Trim(Environment.Variables.Discriminator_Id),'ALL'),
+						Context_Data_Actn,
+						OutputRoot.XMLNSC.Temp.Rtrn_Cd,
+						OutputRoot.XMLNSC.Temp.Flow_Stage,
+						OutputRoot.XMLNSC.Temp.Dump_Flg,
+						OutputRoot.XMLNSC.Temp.Dbg_Md,
+						OutputRoot.XMLNSC.Temp.Notification_Md,
+						OutputRoot.XMLNSC.Temp.Target_Sys,
+						OutputRoot.XMLNSC.Temp.Uniqueness_Period,
+						OutputRoot.XMLNSC.Temp.Audit_Flg,
+						OutputRoot.XMLNSC.Temp.Dump_Exception_Flg,
+						OutputRoot.XMLNSC.Temp.Backout_Queue,
+						OutputRoot.XMLNSC.Temp.S_MessageType,
+						OutputRoot.XMLNSC.Temp.S_MessageDomain,
+						OutputRoot.XMLNSC.Temp.S_MessageSet,
+						OutputRoot.XMLNSC.Temp.S_MessageFormat,
+						OutputRoot.XMLNSC.Temp.S_MsgType,
+						OutputRoot.XMLNSC.Temp.S_DefaultReplyToQ,
+						OutputRoot.XMLNSC.Temp.S_DefaultReplyToQMgr,
+						OutputRoot.XMLNSC.Temp.S_DefaultDestinationQ,
+						OutputRoot.XMLNSC.Temp.S_DefaultDestinationQMgr,
+						OutputRoot.XMLNSC.Temp.S_CodedCharSetId,
+						OutputRoot.XMLNSC.Temp.S_Encoding,
+						OutputRoot.XMLNSC.Temp.S_Expiry,
+						OutputRoot.XMLNSC.Temp.S_Persistence,
+						OutputRoot.XMLNSC.Temp.S_Priority,
+						OutputRoot.XMLNSC.Temp.S_Report_Options,
+						OutputRoot.XMLNSC.Temp.S_XMLNSCEncoding,
+						OutputRoot.XMLNSC.Temp.F_MessageType,
+						OutputRoot.XMLNSC.Temp.F_MessageDomain,
+						OutputRoot.XMLNSC.Temp.F_MessageSet,
+						OutputRoot.XMLNSC.Temp.F_MessageFormat,
+						OutputRoot.XMLNSC.Temp.F_MsgType,
+						OutputRoot.XMLNSC.Temp.F_DefaultReplyToQ,
+						OutputRoot.XMLNSC.Temp.F_DefaultReplyToQMgr,
+						OutputRoot.XMLNSC.Temp.F_DefaultDestinationQ,
+						OutputRoot.XMLNSC.Temp.F_DefaultDestinationQMgr,
+						OutputRoot.XMLNSC.Temp.F_CodedCharSetId,
+						OutputRoot.XMLNSC.Temp.F_Encoding,
+						OutputRoot.XMLNSC.Temp.F_Expiry,
+						OutputRoot.XMLNSC.Temp.F_Persistence,
+						OutputRoot.XMLNSC.Temp.F_Priority,
+						OutputRoot.XMLNSC.Temp.F_Report_Options,
+						OutputRoot.XMLNSC.Temp.F_XMLNSCEncoding,
+						OutputRoot.XMLNSC.Temp.CIF_No,
+						OutputRoot.XMLNSC.Temp.Lang,
+						OutputRoot.XMLNSC.Temp.Rgstr_Chnl_Id,
+						OutputRoot.XMLNSC.Temp.Fun_Id,
+						OutputRoot.XMLNSC.Temp.Rqstr_Info_1,
+						OutputRoot.XMLNSC.Temp.Rqstr_Info_2,
+						OutputRoot.XMLNSC.Temp.Rqstr_Info_3,
+						OutputRoot.XMLNSC.Temp.Rqstr_Info_4,
+						OutputRoot.XMLNSC.Temp.Trx_Md,
+						OutputRoot.XMLNSC.Temp.ReplyToQ,
+						OutputRoot.XMLNSC.Temp.ReplyToQMgr,
+						OutputRoot.XMLNSC.Temp.Encoding,
+						OutputRoot.XMLNSC.Temp.CodedCharSetId,
+						OutputRoot.XMLNSC.Temp.Priority,
+						OutputRoot.XMLNSC.Temp.Usr_Dfn_1,
+						OutputRoot.XMLNSC.Temp.Usr_Dfn_2,
+						OutputRoot.XMLNSC.Temp.Usr_Dfn_3,
+						OutputRoot.XMLNSC.Temp.Usr_Dfn_4,
+						OutputRoot.XMLNSC.Temp.Usr_Dfn_5,
+						OutputRoot.XMLNSC.Temp.Usr_Dfn_6);
+
+
+-- Reading and Caching Results
+ 
+SET OutputRoot.XMLNSC.Temp.Rtrn_Cd  = COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rtrn_Cd),'NULL'),'');  
+IF OutputRoot.XMLNSC.Temp.Rtrn_Cd	='999998' THEN
+	SET OutputRoot.XMLNSC.Exception 	= 300/0; /* to cause an exception */
+END IF;
+
+-- Extract returned data
+
+-- Extarct flow properties
+SET Environment.Variables.FlowProperties.Flow_Stage	 		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Flow_Stage),'NULL'),'');
+SET Environment.Variables.FlowProperties.Dump_Flg	 		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Dump_Flg),'NULL'),'');
+SET Environment.Variables.FlowProperties.Dbg_Md	 			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Dbg_Md),'NULL'),'');
+SET Environment.Variables.FlowProperties.Notification_Md 	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Notification_Md),'NULL'),'');
+SET Environment.Variables.FlowProperties.Target_Sys	 		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Target_Sys),'NULL'),'');
+SET Environment.Variables.FlowProperties.Uniqueness_Period	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Uniqueness_Period),'NULL'),'');
+SET Environment.Variables.FlowProperties.Audit_Flg			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Audit_Flg),'NULL'),'');
+SET Environment.Variables.FlowProperties.Dump_Exception_Flg	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Dump_Exception_Flg),'NULL'),'');
+SET Environment.Variables.FlowProperties.Backout_Queue		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Backout_Queue),'NULL'),'');
+
+-- Extarct success message properties
+
+SET Environment.Variables.SuccessMsgProperties.MessageType		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_MessageType),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.MessageDomain	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_MessageDomain),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.MessageSet		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_MessageSet),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.MessageFormat	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_MessageFormat),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.MsgType			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_MsgType),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.DefaultReplyToQ	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_DefaultReplyToQ),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.DefaultReplyToQMgr		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_DefaultReplyToQMgr),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.DefaultDestinationQ		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_DefaultDestinationQ),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.DefaultDestinationQMgr	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_DefaultDestinationQMgr),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.CodedCharSetId			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_CodedCharSetId),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.Encoding			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_Encoding),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.Expiry			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_Expiry),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.Persistence		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_Persistence),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.Priority			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_Priority),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.Report_Options	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_Report_Options),'NULL'),'');
+SET Environment.Variables.SuccessMsgProperties.XMLNSCEncoding		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.S_XMLNSCEncoding),'NULL'),'');
+
+-- Extarct failure message properties
+
+SET Environment.Variables.FailureMsgProperties.MessageType			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_MessageType),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.MessageDomain		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_MessageDomain),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.MessageSet			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_MessageSet),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.MessageFormat		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_MessageFormat),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.MsgType				= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_MsgType),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.DefaultReplyToQ		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_DefaultReplyToQ),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.DefaultReplyToQMgr	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_DefaultReplyToQMgr),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.DefaultDestinationQ	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_DefaultDestinationQ),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.DefaultDestinationQMgr	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_DefaultDestinationQMgr),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.CodedCharSetId			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_CodedCharSetId),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.Encoding			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_Encoding),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.Expiry			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_Expiry),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.Persistence		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_Persistence),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.Priority			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_Priority),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.Report_Options	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_Report_Options),'NULL'),'');
+SET Environment.Variables.FailureMsgProperties.XMLNSCEncoding		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.F_XMLNSCEncoding),'NULL'),'');
+
+-- Get context and EAI header
+
+IF Environment.Variables.Flow_Tp in ('EAI_RPLY','EAI_INT_REQ') THEN
+	-- Extarct context data
+
+	SET Environment.Variables.ContextReply.CIF_No			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.CIF_No),'NULL'),'');
+	SET Environment.Variables.ContextReply.Lang				= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Lang),'NULL'),'');
+	SET Environment.Variables.ContextReply.Rgstr_Chnl_Id	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rgstr_Chnl_Id),'NULL'),'');
+	SET Environment.Variables.ContextReply.Fun_Id			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Fun_Id),'NULL'),'');
+	SET Environment.Variables.ContextReply.Rqstr_Info_1	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rqstr_Info_1),'NULL'),'');
+	SET Environment.Variables.ContextReply.Rqstr_Info_2	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rqstr_Info_2),'NULL'),'');
+	SET Environment.Variables.ContextReply.Rqstr_Info_3	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rqstr_Info_3),'NULL'),'');
+	SET Environment.Variables.ContextReply.Rqstr_Info_4	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rqstr_Info_4),'NULL'),'');
+	--SET Environment.Variables.ContextReply.Trx_Md			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Trx_Md),'NULL'),'');
+	SET Environment.Variables.ContextReply.ReplyToQ			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.ReplyToQ),'NULL'),'');
+	SET Environment.Variables.ContextReply.ReplyToQMgr		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.ReplyToQMgr),'NULL'),'');
+	SET Environment.Variables.ContextReply.Encoding			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp."Encoding"),'NULL'),'');
+	SET Environment.Variables.ContextReply.CodedCharSetId	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp."CodedCharSetId"),'NULL'),'');
+	SET Environment.Variables.ContextReply.Priority			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp."Priority"),'NULL'),'');
+	SET Environment.Variables.ContextReply.Usr_Dfn_1		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Usr_Dfn_1),'NULL'),'');
+	SET Environment.Variables.ContextReply.Usr_Dfn_2		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Usr_Dfn_2),'NULL'),'');
+	SET Environment.Variables.ContextReply.Usr_Dfn_3		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Usr_Dfn_3),'NULL'),'');
+	SET Environment.Variables.ContextReply.Usr_Dfn_4		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Usr_Dfn_4),'NULL'),'');
+	SET Environment.Variables.ContextReply.Usr_Dfn_5		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Usr_Dfn_5),'NULL'),'');
+-- Removing Trim for Usr_Dfn_6 not to lose the spaces in normal case
+--	SET Environment.Variables.ContextReply.Usr_Dfn_6		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Usr_Dfn_6),'NULL'),'');
+	SET Environment.Variables.ContextReply.Usr_Dfn_6		= COALESCE(NULLIF((OutputRoot.XMLNSC.Temp.Usr_Dfn_6),'NULL'),'');
+	
+	SET OutputRoot.MQMD.ReplyToQ      				= Environment.Variables.ContextReply.ReplyToQ;
+	SET OutputRoot.MQMD.ReplyToQMgr   				= Environment.Variables.ContextReply.ReplyToQMgr;
+	SET OutputRoot.MQMD.Encoding       				= CAST(Environment.Variables.ContextReply.Encoding AS INTEGER); 
+	SET OutputRoot.MQMD.CodedCharSetId 				= CAST(Environment.Variables.ContextReply.CodedCharSetId AS INTEGER);
+	SET OutputRoot.MQMD.Priority 					= CAST(Environment.Variables.ContextReply.Priority AS INTEGER);
+	SET OutputRoot.XMLNSC.EAIHeader.CIF 				= Environment.Variables.ContextReply.CIF_No;
+	SET OutputRoot.XMLNSC.EAIHeader.Lang 				= Environment.Variables.ContextReply.Lang;
+	SET OutputRoot.XMLNSC.EAIHeader.ChnlId 			= Environment.Variables.ContextReply.Rgstr_Chnl_Id;
+	SET OutputRoot.XMLNSC.EAIHeader.FunctnId			= Environment.Variables.ContextReply.Fun_Id;
+	Set OutputRoot.XMLNSC.EAIHeader.Rqstr_Info1		= Environment.Variables.ContextReply.Rqstr_Info_1;
+	Set OutputRoot.XMLNSC.EAIHeader.Rqstr_Info2		= Environment.Variables.ContextReply.Rqstr_Info_2;
+	Set OutputRoot.XMLNSC.EAIHeader.Rqstr_Info3		= Environment.Variables.ContextReply.Rqstr_Info_3;
+	--Set OutputRoot.XMLNSC.EAIHeader.(XMLNSC.Element)Rqstr_Info4.(XMLNSC.AsisElementContent)	= Environment.Variables.ContextReply.Rqstr_Info_4;
+	-- 14/1/2008 Alaa
+	If COALESCE(Environment.Variables.ContextReply.Rqstr_Info_4,'') <> '' Then
+	 
+		Set OutputRoot.XMLNSC.EAIHeader.(XMLNSC.CDataField)Rqstr_Info4	= Environment.Variables.ContextReply.Rqstr_Info_4;
+	End If;
+	--Set OutputRoot.XMLNSC.EAIHeader.Trx_Md			= Environment.Variables.ContextReply.Trx_Md;
+	--Set OutputRoot.XMLNSC.EAIHeader.(XMLNSC.Element)UsrDfn.(XMLNSC.AsisElementContent)		= Environment.Variables.ContextReply.Usr_Dfn_6;
+	If COALESCE(Environment.Variables.ContextReply.Usr_Dfn_6,'') <> '' Then
+    
+		Set OutputRoot.XMLNSC.EAIHeader.(XMLNSC.CDataField)UsrDfn		= Environment.Variables.ContextReply.Usr_Dfn_6;
+	End If;
+	Set Environment.Variables.EAIHeader 			= OutputRoot.XMLNSC.EAIHeader;
+End	IF;
+
+
+SET OutputRoot.XMLNSC.Temp 		= NULL;
+ 
+
+RETURN true;
+END;
+
+create procedure Single_Read (	IN  Msg_Id 						CHARACTER,
+								IN  Flow_Id 					CHARACTER,
+								IN  Chnl_Id						CHARACTER,
+								IN  Discriminator_Id 			CHARACTER,
+								IN  Context_Data_Actn 			CHARACTER,
+								OUT Rtrn_Cd 					CHARACTER,
+								OUT Flow_Stage 					CHARACTER,
+								OUT Dump_Flg 					CHARACTER,
+								OUT Dbg_Md 						CHARACTER,
+								OUT Notification_Md				CHARACTER,
+								OUT Target_Sys 					CHARACTER,
+								OUT Uniqueness_Period 			CHARACTER,
+								OUT Audit_Flg		 			CHARACTER,
+								OUT Dump_Exception_Flg 			CHARACTER,
+								OUT Backout_Queue	 			CHARACTER,
+								OUT S_MessageType 				CHARACTER,
+								OUT S_MessageDomain 			CHARACTER,
+								OUT S_MessageSet 				CHARACTER,
+								OUT S_MessageFormat 			CHARACTER,
+								OUT S_MsgType 					CHARACTER,
+								OUT S_DefaultReplyToQ 			CHARACTER,
+								OUT S_DefaultReplyToQMgr 		CHARACTER,
+								OUT S_DefaultDestinationQ 		CHARACTER,
+								OUT S_DefaultDestinationQMgr 	CHARACTER,
+								OUT S_CodedCharSetId 			CHARACTER,
+								OUT S_Encoding 					CHARACTER,
+								OUT S_Expiry 					CHARACTER,
+								OUT S_Persistence 				CHARACTER,
+								OUT S_Priority 					CHARACTER,
+								OUT S_Report_Options 			CHARACTER,
+								OUT S_XMLNSCEncoding 				CHARACTER,
+								OUT F_MessageType 				CHARACTER,
+								OUT F_MessageDomain 			CHARACTER,
+								OUT F_MessageSet 				CHARACTER,
+								OUT F_MessageFormat 			CHARACTER,
+								OUT F_MsgType 					CHARACTER,
+								OUT F_DefaultReplyToQ 			CHARACTER,
+								OUT F_DefaultReplyToQMgr 		CHARACTER,
+								OUT F_DefaultDestinationQ 		CHARACTER,
+								OUT F_DefaultDestinationQMgr 	CHARACTER,
+								OUT F_CodedCharSetId 			CHARACTER,
+								OUT F_Encoding 					CHARACTER,
+								OUT F_Expiry 					CHARACTER,
+								OUT F_Persistence 				CHARACTER,
+								OUT F_Priority 					CHARACTER,
+								OUT F_Report_Options 			CHARACTER,
+								OUT F_XMLNSCEncoding 				CHARACTER,
+								OUT CIF_No 						CHARACTER,
+								OUT Lang 						CHARACTER,
+								OUT Rgstr_Chnl_Id	 			CHARACTER,
+								OUT Fun_Id 						CHARACTER,
+								OUT Rqstr_Info_1 				CHARACTER,
+								OUT Rqstr_Info_2 				CHARACTER,
+								OUT Rqstr_Info_3 				CHARACTER,
+								OUT Rqstr_Info_4 				CHARACTER,
+								OUT Trx_Md		 				CHARACTER,
+								OUT ReplyToQ 					CHARACTER,
+								OUT ReplyToQMgr 				CHARACTER,
+								OUT Encoding 					CHARACTER,
+								OUT CodedCharSetId 				CHARACTER,
+								OUT Priority 					CHARACTER,
+								OUT Usr_Dfn_1 					CHARACTER,
+								OUT Usr_Dfn_2 					CHARACTER,
+								OUT Usr_Dfn_3 					CHARACTER,
+								OUT Usr_Dfn_4 					CHARACTER,
+								OUT Usr_Dfn_5 					CHARACTER,
+								OUT Usr_Dfn_6 					CHARACTER) EXTERNAL NAME "Single_Read";
+END MODULE;

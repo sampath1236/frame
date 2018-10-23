@@ -1,0 +1,304 @@
+
+CREATE PROCEDURE FormatDate(IN FROMSYS CHARACTER, IN TOSYS CHARACTER, IN FROMDATE CHARACTER) RETURNS CHARACTER
+BEGIN
+		 
+		Declare Tmstmp character '';
+		IF COALESCE(Trim(FROMDATE),'')<>''THEN
+			If FROMSYS = 'GL' AND TOSYS = 'EAI' Then
+				Set Tmstmp = '20'||substring(FROMDATE from 1 for 2)
+							||'-'||substring(FROMDATE from 3 for 2)
+							||'-'||substring(FROMDATE from 5 for 2)
+							||' '||substring(FROMDATE from 7 for 2)
+							||':'||substring(FROMDATE from 9 for 2)
+							||':00';
+				Return Tmstmp;
+			End If;
+			
+			
+			IF FROMSYS='EAI' AND TOSYS='SADAD' THEN
+				Set Tmstmp = substring(FROMDATE from 12 for 10) || 'T' ||
+							substring(FROMDATE from 23 for 8);
+				Return Tmstmp;			
+			END IF;
+			
+			IF FROMSYS='SADAD' AND TOSYS='EAI' THEN
+				Set Tmstmp = substring(FROMDATE from 1 for 4) || 
+							substring(FROMDATE from 6 for 2)  ||
+							substring(FROMDATE from 9 for 2)  ;
+				Return Tmstmp;			
+			END IF;
+			
+			IF FROMSYS='SADAD' AND TOSYS='GL' THEN
+				SET Tmstmp = SUBSTRING(FROMDATE FROM 1 FOR 4);
+				SET Tmstmp = Tmstmp || SUBSTRING(FROMDATE FROM 6 FOR 2);
+				SET Tmstmp = Tmstmp || SUBSTRING(FROMDATE FROM 9 FOR 2);
+				Return Tmstmp;			
+	
+			END IF;
+			
+			IF FROMSYS='EAI' AND TOSYS='GL' THEN
+				-- Ahmed Shaaban 21/6/2009 EVoting CR
+				-- yyyyMMDDHHmmss
+				Set Tmstmp = substring(FROMDATE from 12 for 4) || substring(FROMDATE from 17 for 2) ||
+							 		substring(FROMDATE from 20 for 2) || substring(FROMDATE from 23 for 2) || 
+							 		substring(FROMDATE from 26 for 2) || substring(FROMDATE from 29 for 2);
+				Return Tmstmp;			
+			END IF;			
+		Else
+			Return Tmstmp;
+		END IF;
+END;
+
+	CREATE FUNCTION GetBeneficiaryDesc(String1 CHARACTER, String2 CHARACTER, String3 CHARACTER, NumOfLines INTEGER, LineLength INTEGER) RETURNS CHARACTER BEGIN
+
+		DECLARE CurrentLine INTEGER 1;
+		DECLARE ReturnedString CHARACTER '';
+		DECLARE Telephone CHARACTER 'Tel.:';
+
+		
+		IF (String1 IS NOT NULL and String1 <> '') THEN
+			
+			SET CurrentLine = (CAST(LENGTH(TRIM(String1)) AS INTEGER) / LineLength) + 1;
+			
+			IF (CurrentLine >= NumOfLines ) THEN
+				SET ReturnedString = SUBSTRING (TRIM(String1) FROM 1 FOR (NumOfLines*LineLength));
+				-- ReturnedString now contains the full length or less
+				-- If less, append right spaces
+				IF (LENGTH(ReturnedString) < NumOfLines*LineLength) THEN
+					SET ReturnedString = ReturnedString || SPACE(LineLength - MOD(CAST(LENGTH(TRIM(ReturnedString)) AS INTEGER),LineLength));
+				END IF;
+				RETURN ReturnedString;
+			ELSE
+				SET ReturnedString = TRIM(String1);
+				-- add spaces (right spaces) to the current line so the line length will be equal to the required "LineLength" parameter
+				IF (MOD(CAST(LENGTH(TRIM(String1)) AS INTEGER),LineLength) <> 0) THEN
+					SET ReturnedString = ReturnedString || SPACE(LineLength - MOD(CAST(LENGTH(TRIM(String1)) AS INTEGER),LineLength));
+				END IF;
+			END IF;
+			
+		END IF;
+		
+		IF (String2 IS NOT NULL and String2 <> '' ) THEN
+			-- processing the second string
+			SET CurrentLine = CurrentLine + 1;
+
+			IF ((CAST(LENGTH(TRIM(String2)) AS INTEGER) / LineLength) + CurrentLine >= NumOfLines) THEN
+				SET ReturnedString = ReturnedString || SUBSTRING (TRIM(String2) FROM 1 FOR (NumOfLines*LineLength-LENGTH(ReturnedString)) );
+				RETURN ReturnedString;
+			ELSE
+				SET ReturnedString = ReturnedString || TRIM(String2);
+				-- check if the current line has enough place to add the Benificiary phone
+				IF (LineLength - MOD(CAST(LENGTH(TRIM(String2)) AS INTEGER),LineLength) > LENGTH(TRIM(String3))+Length(Telephone)+1) THEN
+					SET ReturnedString = ReturnedString || ' ' || Telephone || TRIM(String3) || SPACE(LineLength - MOD(CAST(LENGTH(TRIM(String3))+Length(Telephone)+1+LENGTH(TRIM(String2)) AS INTEGER),LineLength));
+				ELSE
+					-- no place for Beneficiary phone, so add spaces
+					SET ReturnedString = ReturnedString || SPACE(LineLength - MOD(CAST(LENGTH(TRIM(String2)) AS INTEGER),LineLength));
+					
+					IF(LENGTH(ReturnedString) < NumOfLines*LineLength) THEN
+						SET ReturnedString = ReturnedString || Telephone || TRIM(String3) || SPACE(LineLength - MOD(CAST(LENGTH(TRIM(String3))+Length(Telephone) AS INTEGER),LineLength));				
+						-- Just in case that telephone number may exceeds the LineLength, we will return the required String length only.
+						SET ReturnedString = SUBSTRING(ReturnedString FROM 1 FOR NumOfLines*LineLength);
+					END IF;
+					
+				END IF;
+				
+			END IF;
+			
+		ELSE
+			-- add Beneficiary phone
+			IF(LENGTH(ReturnedString) < NumOfLines*LineLength and String3 IS NOT NULL and String3 <> '' ) THEN
+				SET ReturnedString = ReturnedString || Telephone || TRIM(String3) || SPACE(LineLength - MOD(CAST(LENGTH(TRIM(String3))+Length(Telephone) AS INTEGER),LineLength));				
+				-- Just in case that telephone number may exceeds the LineLength, we will return the required String length only.
+				SET ReturnedString = SUBSTRING(ReturnedString FROM 1 FOR NumOfLines*LineLength);
+			END IF;
+		END IF;
+		
+		RETURN ReturnedString;
+	END;
+	
+	
+	
+CREATE PROCEDURE formatSADADProcessingDay(in sadadProcessingDay character) RETURNS CHARACTER
+BEGIN
+	declare oldDate character '';
+	
+	set oldDate = COALESCE(NULLIF(Trim(sadadProcessingDay),'NULL'),'');
+	
+	if oldDate = '' or oldDate = null or length(oldDate) < 19 then
+	
+		return oldDate;
+	
+	else
+		declare newDate character '';
+		
+   		set newDate = OVERLAY(oldDate placing '00:00:00' from 12 for 8);
+
+   		return newDate;
+
+	end if;
+				 
+END;
+
+
+
+
+
+CREATE FUNCTION WalkTree(In Cursor1 REFERENCE, 
+					In Cursor2 REFERENCE)  BEGIN
+		IF Cursor2.TargetNamespace = '' THEN
+--
+-- Need to remove schemalocation and namespace declarations
+--
+			SET Cursor1.(XML.Element)*[1].*:schemaLocation = NULL;
+			DECLARE I1 INTEGER 
+				CARDINALITY(Cursor1.(XML.Element)*[1].(XMLNSC.NamespaceDecl)*[]);
+			DECLARE I2 INTEGER 1;
+			WHILE I2 <= I1 DO
+				SET Cursor1.(XML.Element)*[1].(XMLNSC.NamespaceDecl)*[1] = NULL;
+				SET I2 = I2 + 1;
+			END WHILE;	 
+		ELSE
+--
+-- Need to modify the schema locations and the namespace declarations
+--
+-- The target schemalocations can be identified within the source message's
+-- MQRFH2 header, <usr> folder, tag <TargetSchemaLocation>
+--
+			IF Cursor1.(XML.Element)*[1].*:schemaLocation IS NOT NULL THEN
+				SET Cursor1.(XML.Element)*[1].*:schemaLocation 
+						= Cursor2.TargetSchemaLocation;
+			END IF;	
+		END IF;	
+--		
+-- CHECKSIBLING is a flag which, when set to TRUE, ensures that the WHILE loop does an
+-- unconditional MOVE ... NEXTSIBLING (rather than MOVE ... FIRSTCHILD)
+-- We need this when we go up a level in the tree... otherwise we go back where we have
+-- just come from
+--
+		DECLARE CHECKSIBLING BOOLEAN FALSE;
+--
+-- DEPTH determines when to finish.  
+-- Every time we MOVE FIRSTCHILD we add 1 to DEPTH
+-- Every time we MOVE PARENT we subtract 1 from DEPTH
+-- MOVE NEXTSIBLING does not change DEPTH
+-- Initial value is 1, so we are finished when DEPTH = 0
+--
+		DECLARE DEPTH INTEGER 1;
+--
+-- Walk the tree top to bottom, left to right
+--
+		WHILE DEPTH <> 0 DO 
+		IF CHECKSIBLING = FALSE THEN 
+			MOVE Cursor1 FirstChild;
+		 	IF LASTMOVE(Cursor1) = TRUE THEN
+				SET DEPTH = DEPTH + 1;
+				CALL SetNamespace(Cursor1, Cursor2);
+		 	ELSE
+		 		MOVE Cursor1 NEXTSIBLING;
+			 	IF LASTMOVE(Cursor1) = TRUE THEN
+					CALL SetNamespace(Cursor1, Cursor2);
+					SET CHECKSIBLING = FALSE;
+			 	ELSE
+					SET DEPTH = DEPTH - 1;
+					Move Cursor1 PARENT;		 		
+					SET CHECKSIBLING = TRUE;
+				END IF;
+		 	END IF;	
+	 	ELSE
+	 		MOVE Cursor1 NEXTSIBLING;
+		 	IF LASTMOVE(Cursor1) = TRUE THEN
+				CALL SetNamespace(Cursor1, Cursor2);
+				SET CHECKSIBLING = FALSE;
+		 	ELSE
+				SET DEPTH = DEPTH - 1;
+				Move Cursor1 PARENT;		 		
+				SET CHECKSIBLING = TRUE;
+			END IF;
+	 	END IF;
+		END WHILE;
+	END;
+
+
+CREATE FUNCTION SetNamespace(IN Cursor1 REFERENCE, IN Environment REFERENCE) BEGIN
+--
+-- Check for elements/attributes with the source namespace		
+--
+		IF FIELDTYPE(Cursor1) IN (0x01000000, 0x03000000, 0x03000102) 
+			AND FIELDNAMESPACE(Cursor1) IN (Environment.SourceNamespace) THEN 
+--
+-- Set the new target namespace
+--
+			SET Cursor1 NAMESPACE = Environment.TargetNamespace;
+--
+-- Get rid of any inline namespace definitions
+--
+			SET Cursor1.(XMLNSC.NamespaceDecl)* = NULL; 
+		END IF;
+	END;
+
+	
+	
+CREATE PROCEDURE GetISOFormattedBalance(IN Amt1 CHARACTER, IN Amt2 CHARACTER, IN Acc_Tp1 CHARACTER, IN Acc_Tp2 CHARACTER, IN Amt_Tp1 CHARACTER, IN Amt_Tp2 CHARACTER, IN Curr_Cd1 CHARACTER, IN Curr_Cd2 CHARACTER) RETURNS CHARACTER  BEGIN
+	 
+--			The format of DE054 is like the following
+--			<DE054>0001682C0000001000000002682C000994547500</DE054>
+--			account type:                   00
+--			amount type :                   01
+--			currency code :                 682
+--			Sign(D/C):                      C
+--			Amount:                         000000100000
+--			account type:                   00
+--			amount type :                   02
+--			currency code :                 682
+--			Sign(D/C):                      C
+--			Amount:                         000994547500
+			
+			DECLARE SIGN1,SIGN2,BALANCE1,BALANCE2,zeroReplication1,zeroReplication2 CHARACTER '';
+			
+			-- handling balance value
+			-- for example, the value came from T24 like 1423.08
+			-- cast as decimal then multiply by 100 so the value will be 142308.00
+			-- cast again as integer to remove .00
+			-- so the final value will looks like 142308 which is required by cortex
+			
+			IF (Amt1 IS NOT NULL AND Amt1 <> '') THEN
+				SET BALANCE1 = CAST(CAST(Amt1 AS DECIMAL) * 100 AS INTEGER);
+				-- determining the sign (C or D) based on the balance
+				IF ( CAST (Amt1 AS DECIMAL) >= 0 ) THEN
+					SET SIGN1 = 'C';
+				ELSE
+					SET SIGN1 = 'D';
+					SET BALANCE1 = CAST(BALANCE1 AS DECIMAL) * -1; --make it positive
+				END IF;	
+				SET	zeroReplication1 = REPLICATE ('0', 12 - LENGTH(BALANCE1));		
+			END IF;
+			
+			IF (Amt2 IS NOT NULL AND Amt2 <> '') THEN
+				SET BALANCE2 = CAST(CAST(Amt2 AS DECIMAL) * 100 AS INTEGER);
+				-- determining the sign (C or D) based on the balance
+				IF ( CAST (Amt2 AS DECIMAL) >= 0 ) THEN
+					SET SIGN2 = 'C';
+				ELSE
+					SET SIGN2 = 'D';
+					SET BALANCE2 = CAST(BALANCE2 AS DECIMAL) *  -1; --make it positive
+				END IF;
+				SET	zeroReplication2 = REPLICATE ('0', 12 - LENGTH(BALANCE2));		
+			END IF;
+			
+
+									
+			RETURN	Acc_Tp1		||
+					Amt_Tp1		||
+					Curr_Cd1	||
+					SIGN1		||
+					zeroReplication1	||
+					BALANCE1	||
+					Acc_Tp2		||
+					Amt_Tp2		||
+					Curr_Cd2	||
+					SIGN2		||	
+					zeroReplication2	||
+					BALANCE2;
+	
+END;
+	

@@ -1,0 +1,80 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.2														--
+-- Comments			 : Updated by Alaa ahmed on 19/07/2006																	--
+-- ************************************************************************************ --
+CREATE COMPUTE MODULE TransactionAuthentication_CallTransactionAuthenticationSP
+CREATE FUNCTION Main() RETURNS BOOLEAN
+BEGIN
+Set OutputRoot = InputRoot;
+-- Call Transaction Authentication SP
+DECLARE MSGID CHARACTER;
+SET MSGID = SUBSTRING(CAST(OutputRoot.MQMD.MsgId AS CHAR) FROM 3 FOR 48);
+
+CALL Transaction_Authentication
+	(	MSGID,
+		COALESCE(Trim(Environment.Variables.EAIHeader.ChnlId),''),
+		COALESCE(Trim(Environment.Variables.EAIHeader.FunctnId),''),
+		COALESCE(Trim(Environment.Variables.EAIHeader.CIF),''),							
+		COALESCE(Trim(Environment.Variables.TrxAuthentication.Amt_SAR),''),
+		COALESCE(Trim(Environment.Variables.TrxAuthentication.Password),''),
+		COALESCE(Trim(Environment.Variables.TrxAuthentication.Token_Hsh),''),
+		COALESCE(Trim(Environment.Variables.TrxAuthentication.Last_Trx_Flg),''),
+		COALESCE(Trim(Environment.Variables.FlowProperties.Dbg_Md),''),
+		OutputRoot.XMLNSC.Temp.Rtrn_Cd);
+						
+-- Extarct Data
+SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd	= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rtrn_Cd),'NULL'),''); 
+SET OutputRoot.XMLNSC.Temp 		= NULL;
+
+Return True;
+End;
+
+create procedure Transaction_Authentication 
+	(	IN  Msg_ID						CHARACTER,
+		IN  Chnl_Id						CHARACTER,
+		IN  Fun_Id						CHARACTER,
+		IN  CIF_No						CHARACTER,
+		IN  Amt_SAR						CHARACTER,
+		IN  Password					CHARACTER,
+		IN  Token_Hsh					CHARACTER,
+		IN  Last_Trx_Flg				CHARACTER,
+		IN  Dbg_Md						CHARACTER,
+		OUT Rtrn_Cd						CHARACTER
+	) EXTERNAL NAME "Transaction_Authentication";
+
+
+END MODULE;
+
+
+CREATE FILTER MODULE "TransactionAuthentication_Success?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN Body.EAIHeader.EAIRtrnCd = '000000';
+END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE TransactionAuthentication_Compute_PreTransactionAuthentication
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

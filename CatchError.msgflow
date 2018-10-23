@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmFilter.msgnode="ComIbmFilter.msgnode" xmlns:ComIbmFlowOrder.msgnode="ComIbmFlowOrder.msgnode" xmlns:ComIbmMQOutput.msgnode="ComIbmMQOutput.msgnode" xmlns:ComIbmMQReply.msgnode="ComIbmMQReply.msgnode" xmlns:ComIbmResetContentDescriptor.msgnode="ComIbmResetContentDescriptor.msgnode" xmlns:ComIbmThrow.msgnode="ComIbmThrow.msgnode" xmlns:ComIbmTrace.msgnode="ComIbmTrace.msgnode" xmlns:DumpMessage.msgflow="DumpMessage.msgflow"
+    xmlns:RollbackProcessing.msgflow="RollbackProcessing.msgflow" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" xmi:id="EPackage_1"
+    nsURI="CatchError.msgflow" nsPrefix="CatchError.msgflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" xmi:id="FCMComposite_1" name="FCMComposite_1">
+    <eAnnotations>
+      <details key="xmi:uuid" value="d7b64ed4-fb00-0000-0080-82ac93392bf1"/>
+    </eAnnotations>
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.RollbackFormatter" name="RollbackFormatter" defaultValueLiteral="RollbackProcessing_RollbackFormatter">
+      <eType xmi:type="ecore:EDataType" href="http://www.ibm.com/wbi/2005/eflow#//EsqlModule"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.messageDomain" name="messageDomain">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.resetMessageDomain" name="resetMessageDomain" lowerBound="1" defaultValueLiteral="false">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.messageSet" name="messageSet">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.resetMessageSet" name="resetMessageSet" lowerBound="1" defaultValueLiteral="false">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.messageType" name="messageType">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.resetMessageType" name="resetMessageType" lowerBound="1" defaultValueLiteral="false">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.messageFormat" name="messageFormat">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.resetMessageFormat" name="resetMessageFormat" lowerBound="1" defaultValueLiteral="false">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.messageSet1" name="messageSet1">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.resetMessageSet1" name="resetMessageSet1" lowerBound="1" defaultValueLiteral="false">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.messageType1" name="messageType1">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.resetMessageType1" name="resetMessageType1" lowerBound="1" defaultValueLiteral="false">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_1" key="CatchError" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_1" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj16/CatchError.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" xmi:id="GIFFileGraphic_2" resourceName="platform:/plugin/Framework_MFPrj/icons/full/obj30/CatchError.gif"/>
+    <composition xmi:id="Composition_1">
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="71,19" filterExpression="CatchError_DB_Error?">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_1" string="DB Error?"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="713,194" computeExpression="CatchError_CopyMessage">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_5" key="CopyMessage" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="190,283" filterExpression="CatchError_Rollback?">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_3" string="Rollback?"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="322,340" filterExpression="CatchError_BackoutCount=0?">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_9" key="Backout Count = 0 ?" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="448,379" filterExpression="CatchError_NoReplyRequired?">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_10" key="No Reply Required ?" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmThrow.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="692,8" messageNumber="3006" messageText="MQSI flow failure occured check MQSI log">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_12" key="Return" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="596,474" computeExpression="CatchError_BuildHeader" computeMode="exceptionAndMessage">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_2" string="Build Header"/>
+      </nodes>
+      <nodes xmi:type="ComIbmTrace.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="417,360" pattern="Diagnostics from MQInput Catch flow &#xA;${Root}&#xA;${ExceptionList}">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_14" key="User Trace" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmMQReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_13" location="646,518" transactionMode="no">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_15" key="Send Reply (Error)" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.In" location="5,20">
+        <translation xmi:type="utility:TranslatableString" xmi:id="TranslatableString_3" key="InTerminal.In" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="773,315" computeExpression="CatchError_Compute_SetBackoutQueue" computeMode="destinationAndMessage">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_7" string="Set Backout Queue"/>
+      </nodes>
+      <nodes xmi:type="ComIbmResetContentDescriptor.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="509,427" messageDomain="XMLNSC" resetMessageDomain="true" messageFormat="XML" resetMessageFormat="true">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_5" string="ResetContentDescriptor"/>
+      </nodes>
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_14" location="865,383" destinationMode="list">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_8" string="Backout"/>
+      </nodes>
+      <nodes xmi:type="RollbackProcessing.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_15" location="785,192">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_9" string="RollbackProcessing"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFlowOrder.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_16" location="118,53">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_6" string="Ensure Backout"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFlowOrder.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="648,187">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_4" string="FlowOrder"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="719,76" filterExpression="Catch_Error_DumpRequired">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_10" string="Dump Required?"/>
+      </nodes>
+      <nodes xmi:type="DumpMessage.msgflow:FCMComposite_1" xmi:id="FCMComposite_1_17" location="813,77" computeExpression="CatchError_DumpMessage_Truncate">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_11" string="DumpMessage"/>
+      </nodes>
+      <nodes xmi:type="ComIbmFilter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_18" location="374,127" filterExpression="CatchError_XML?">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_12" string=" XML?"/>
+      </nodes>
+      <nodes xmi:type="ComIbmResetContentDescriptor.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_19" location="458,126" messageDomain="XMLNSC" resetMessageDomain="true" messageFormat="XML" resetMessageFormat="true">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_13" string="Set To XML"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_20" location="551,164" computeExpression="esql://routine/#CatchError_BLOBToXMLNSC.Main">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_14" string="BLOB To XML"/>
+      </nodes>
+      <nodes xmi:type="ComIbmResetContentDescriptor.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_21" location="431,221">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_15" string="Set To MRM"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_22" location="543,245" computeExpression="esql://routine/#CatchError_MRMToXMLNSC.Main">
+        <translation xmi:type="utility:ConstantString" xmi:id="ConstantString_16" string="MRM To XML"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_15" targetNode="FCMComposite_1_2" sourceNode="InTerminal.In" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_16" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_17" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_18" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_27" targetNode="FCMComposite_1_12" sourceNode="FCMComposite_1_7" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_28" targetNode="FCMComposite_1_8" sourceNode="FCMComposite_1_12" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_29" targetNode="FCMComposite_1_13" sourceNode="FCMComposite_1_11" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_31" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_32" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_37" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_38" targetNode="FCMComposite_1_6" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_41" targetNode="FCMComposite_1_11" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="FCMComposite_1_14" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="FCMComposite_1_15" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_16" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_16" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_16" sourceTerminalName="OutTerminal.first" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_16" sourceTerminalName="OutTerminal.second" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.second" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.first" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_17" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.In"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_11" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_13" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_14" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_19" targetNode="FCMComposite_1_19" sourceNode="FCMComposite_1_18" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_20" targetNode="FCMComposite_1_21" sourceNode="FCMComposite_1_18" sourceTerminalName="OutTerminal.false" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_21" targetNode="FCMComposite_1_22" sourceNode="FCMComposite_1_21" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_22" targetNode="FCMComposite_1_20" sourceNode="FCMComposite_1_19" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_23" targetNode="FCMComposite_1_18" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.true" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_24" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_20" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_25" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_22" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_26" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_22" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_30" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_20" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_33" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_19" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_34" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_21" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_35" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_18" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_36" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_18" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer xmi:id="PropertyOrganizer_1">
+      <propertyDescriptor xmi:id="PropertyDescriptor_1" groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.EsqlModulePropertyEditor" compiler="com.ibm.etools.mft.ibmnodes.compilers.EsqlModulePropertyCompiler" describedAttribute="Property.RollbackFormatter">
+        <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_2" key="Property.RollbackFormatter" bundleName="RollbackProcessing" pluginId="FrameworkMsgFlowsPrj"/>
+        <propertyDescriptor xmi:id="PropertyDescriptor_2" groupName="Group.Group1" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.MRMessageDomainPropertyEditor" describedAttribute="Property.messageDomain">
+          <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_4" key="Property.messageDomain" bundleName="ComIbmResetContentDescriptor" pluginId="com.ibm.etools.mft.ibmnodes"/>
+          <propertyDescriptor xmi:id="PropertyDescriptor_3" groupName="Group.Group1" compiler="com.ibm.etools.mft.ibmnodes.compilers.BooleanPropertyCompiler" describedAttribute="Property.resetMessageDomain">
+            <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_6" key="Property.resetMessageDomain" bundleName="ComIbmResetContentDescriptor" pluginId="com.ibm.etools.mft.ibmnodes"/>
+            <propertyDescriptor xmi:id="PropertyDescriptor_4" groupName="Group.Group1" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.MRMessageSetNamePropertyEditor" describedAttribute="Property.messageSet">
+              <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_7" key="Property.messageSet" bundleName="ComIbmResetContentDescriptor" pluginId="com.ibm.etools.mft.ibmnodes"/>
+              <propertyDescriptor xmi:id="PropertyDescriptor_5" groupName="Group.Group1" compiler="com.ibm.etools.mft.ibmnodes.compilers.BooleanPropertyCompiler" describedAttribute="Property.resetMessageSet">
+                <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_8" key="Property.resetMessageSet" bundleName="ComIbmResetContentDescriptor" pluginId="com.ibm.etools.mft.ibmnodes"/>
+                <propertyDescriptor xmi:id="PropertyDescriptor_6" groupName="Group.Group1" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.MRMessageTypePropertyEditor" describedAttribute="Property.messageType">
+                  <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_11" key="Property.messageType" bundleName="ComIbmResetContentDescriptor" pluginId="com.ibm.etools.mft.ibmnodes"/>
+                  <propertyDescriptor xmi:id="PropertyDescriptor_7" groupName="Group.Group1" compiler="com.ibm.etools.mft.ibmnodes.compilers.BooleanPropertyCompiler" describedAttribute="Property.resetMessageType">
+                    <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_13" key="Property.resetMessageType" bundleName="ComIbmResetContentDescriptor" pluginId="com.ibm.etools.mft.ibmnodes"/>
+                    <propertyDescriptor xmi:id="PropertyDescriptor_8" groupName="Group.Group1" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.MRMessageFormatPropertyEditor" describedAttribute="Property.messageFormat">
+                      <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_16" key="Property.messageFormat" bundleName="ComIbmResetContentDescriptor" pluginId="com.ibm.etools.mft.ibmnodes"/>
+                      <propertyDescriptor xmi:id="PropertyDescriptor_9" groupName="Group.Group1" compiler="com.ibm.etools.mft.ibmnodes.compilers.BooleanPropertyCompiler" describedAttribute="Property.resetMessageFormat">
+                        <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_17" key="Property.resetMessageFormat" bundleName="ComIbmResetContentDescriptor" pluginId="com.ibm.etools.mft.ibmnodes"/>
+                        <propertyDescriptor xmi:id="PropertyDescriptor_10" groupName="Group.Group2" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.MRMessageSetNamePropertyEditor" describedAttribute="Property.messageSet1">
+                          <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_18" key="Property.messageSet1" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+                          <propertyDescriptor xmi:id="PropertyDescriptor_11" groupName="Group.Group2" compiler="com.ibm.etools.mft.ibmnodes.compilers.BooleanPropertyCompiler" describedAttribute="Property.resetMessageSet1">
+                            <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_19" key="Property.resetMessageSet1" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+                            <propertyDescriptor xmi:id="PropertyDescriptor_12" groupName="Group.Group2" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.MRMessageTypePropertyEditor" describedAttribute="Property.messageType1">
+                              <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_20" key="Property.messageType1" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+                              <propertyDescriptor xmi:id="PropertyDescriptor_13" groupName="Group.Group2" compiler="com.ibm.etools.mft.ibmnodes.compilers.BooleanPropertyCompiler" describedAttribute="Property.resetMessageType1">
+                                <propertyName xmi:type="utility:TranslatableString" xmi:id="TranslatableString_21" key="Property.resetMessageType1" bundleName="CatchError" pluginId="Framework_MFPrj"/>
+                              </propertyDescriptor>
+                            </propertyDescriptor>
+                          </propertyDescriptor>
+                        </propertyDescriptor>
+                      </propertyDescriptor>
+                    </propertyDescriptor>
+                  </propertyDescriptor>
+                </propertyDescriptor>
+              </propertyDescriptor>
+            </propertyDescriptor>
+          </propertyDescriptor>
+        </propertyDescriptor>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_1" promotedAttribute="Property.RollbackFormatter" overriddenNodes="FCMComposite_1_15">
+      <overriddenAttribute href="RollbackProcessing.msgflow#Property.RollbackFormatter"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_2" promotedAttribute="Property.messageDomain" overriddenNodes="FCMComposite_1_21">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.messageDomain"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_3" promotedAttribute="Property.resetMessageDomain" overriddenNodes="FCMComposite_1_21">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.resetMessageDomain"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_4" promotedAttribute="Property.messageSet" overriddenNodes="FCMComposite_1_21">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.messageSet"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_5" promotedAttribute="Property.resetMessageSet" overriddenNodes="FCMComposite_1_21">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.resetMessageSet"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_6" promotedAttribute="Property.messageType" overriddenNodes="FCMComposite_1_21">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.messageType"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_7" promotedAttribute="Property.resetMessageType" overriddenNodes="FCMComposite_1_21">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.resetMessageType"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_8" promotedAttribute="Property.messageFormat" overriddenNodes="FCMComposite_1_21">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.messageFormat"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_9" promotedAttribute="Property.resetMessageFormat" overriddenNodes="FCMComposite_1_21">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.resetMessageFormat"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_10" promotedAttribute="Property.messageSet1" overriddenNodes="FCMComposite_1_19">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.messageSet"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_11" promotedAttribute="Property.resetMessageSet1" overriddenNodes="FCMComposite_1_19">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.resetMessageSet"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_12" promotedAttribute="Property.messageType1" overriddenNodes="FCMComposite_1_19">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.messageType"/>
+    </attributeLinks>
+    <attributeLinks xmi:id="FCMPromotedAttributeLink_13" promotedAttribute="Property.resetMessageType1" overriddenNodes="FCMComposite_1_19">
+      <overriddenAttribute href="ComIbmResetContentDescriptor.msgnode#Property.resetMessageType"/>
+    </attributeLinks>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>

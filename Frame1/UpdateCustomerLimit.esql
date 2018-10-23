@@ -1,0 +1,90 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.8														--
+-- Comments			 : Updated by Alaa ahmed on 29/07/2006																	--
+-- ************************************************************************************ --
+
+CREATE COMPUTE MODULE UpdateCustomerLimit_CallUpdateCustomerLimitSP
+CREATE FUNCTION Main() RETURNS BOOLEAN BEGIN 
+
+SET OutputRoot = InputRoot;
+
+-- Call Update_Customer_Limit SP
+DECLARE MSGID CHARACTER;
+SET MSGID = SUBSTRING(CAST(OutputRoot.MQMD.MsgId AS CHAR) FROM 3 FOR 48);
+
+CALL Update_Customer_Limit(	MSGID,
+			          		COALESCE(Trim(Environment.Variables.EAIHeader.CIF),''),
+			          		COALESCE(Trim(Environment.Variables.EAIHeader.ChnlId),''),
+							COALESCE(Trim(Environment.Variables.EAIHeader.FunctnId),''),
+							COALESCE(Trim(Environment.Variables.CustomerLimit.Trx_Amt),''),
+							COALESCE(Trim(Environment.Variables.CustomerLimit.Override_Md),''),
+							COALESCE(Trim(Environment.Variables.CustomerLimit.Rvrsl_Flg),'0'),
+							COALESCE(Trim(Environment.Variables.FlowProperties.Dbg_Md),''),
+							OutputRoot.XMLNSC.Temp.Rtrn_Cd,
+							OutputRoot.XMLNSC.Temp.Min_Lmt,
+							OutputRoot.XMLNSC.Temp.Trx_Usage,
+							OutputRoot.XMLNSC.Temp.Rmng_Avl,
+							OutputRoot.XMLNSC.Temp.Trx_Count);
+						
+-- Extarct Data
+SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd  				= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rtrn_Cd),'NULL'),''); 
+SET Environment.Variables.CustomerLimit.Min_Lmt			= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Min_Lmt),'NULL'),'');						
+SET Environment.Variables.CustomerLimit.Trx_Usage		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Trx_Usage),'NULL'),'');
+SET Environment.Variables.CustomerLimit.Rmng_Avl		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Rmng_Avl),'NULL'),'');
+SET Environment.Variables.CustomerLimit.Trx_Count		= COALESCE(NULLIF(Trim(OutputRoot.XMLNSC.Temp.Trx_Count),'NULL'),'');
+
+SET OutputRoot.XMLNSC.Temp 		= NULL;
+
+RETURN TRUE;
+END;
+
+create procedure Update_Customer_Limit (IN  Msg_ID						CHARACTER,
+										IN  CIF_No						CHARACTER,
+										IN  Chnl_Id						CHARACTER,
+										IN  Fun_Id						CHARACTER,
+										IN  Trx_Amt						CHARACTER,
+										IN  Override_Md					CHARACTER,
+										IN  Rvrsl_Flg					CHARACTER,
+										IN  Dbg_Md						CHARACTER,
+										OUT Rtrn_Cd 					CHARACTER,
+										OUT Min_Lmt 					CHARACTER,
+										OUT Trx_Usage 					CHARACTER,
+										OUT Rmng_Avl 					CHARACTER,
+										OUT Trx_Count					CHARACTER) EXTERNAL NAME "Update_Customer_Limit";
+
+END MODULE;
+
+
+
+CREATE FILTER MODULE "UpdateCustomerLimit_Success?"
+CREATE FUNCTION Main() RETURNS BOOLEAN	BEGIN
+	RETURN Body.EAIHeader.EAIRtrnCd = '000000';
+END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE UpdateCustomerLimit_PreUpdateCustomerLimit
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

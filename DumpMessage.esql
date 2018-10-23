@@ -1,0 +1,83 @@
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.20															--
+-- Comments			 : Updated by Moustapha Abdel Aziz on 26/08/2006																	--
+-- ************************************************************************************ --
+CREATE COMPUTE MODULE DumpMessage_PrepareMessage
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+--DECLARE I INTEGER;
+--SET I = 1;
+--WHILE I < CARDINALITY(InputRoot.*[]) DO
+--	SET OutputRoot.*[I] = InputRoot.*[I];
+--	SET I=I+1;
+--END WHILE;
+
+--CALL CopyMessageHeaders();
+
+--SET OutputRoot.Properties.CodedCharSetId 	= 1089;
+--SET OutputRoot.Properties.Encoding 			= 546;
+--SET OutputRoot.MQMD.CodedCharSetId 	= 1089;
+--SET OutputRoot.MQMD.Encoding 			= 546;
+
+SET OutputRoot.Properties.CodedCharSetId 	= InputRoot.Properties.CodedCharSetId;
+SET OutputRoot.Properties.Encoding 			= InputRoot.Properties.Encoding;
+SET OutputRoot.MQMD.CodedCharSetId 	= InputRoot.MQMD.CodedCharSetId;
+SET OutputRoot.MQMD.Encoding 			= InputRoot.MQMD.Encoding;
+SET OutputRoot.MQMD.Format      = InputRoot.MQMD.Format;
+SET OutputRoot.MQMD.MsgId       = InputRoot.MQMD.MsgId;     
+SET OutputRoot.MQMD.ReplyToQMgr 			= '';
+SET OutputRoot.MQMD.Expiry 		=	-1; -- unlimited
+SET OutputRoot.MQMD.Persistence =	MQPER_PERSISTENCE_AS_Q_DEF;
+SET OutputRoot.MQMD.Priority	=	MQPRI_PRIORITY_AS_Q_DEF;
+SET OutputRoot.MQMD.Report		=	MQRO_NONE;
+SET OutputRoot.MQMD.Feedback	= 	0;
+
+SET OutputRoot.XMLNSC.DumpMessage.Msg_Data		= InputBody;
+SET OutputRoot.XMLNSC.DumpMessage.Dump_Msg_Tp	= Environment.Variables.Dump_Msg_Tp;
+SET OutputRoot.XMLNSC.DumpMessage.Flow_Id 		= Environment.Variables.Flow_Id;
+SET OutputRoot.XMLNSC.DumpMessage.CIF_No		= Environment.Variables.EAIHeader.CIF;
+SET OutputRoot.XMLNSC.DumpMessage.TimeStamp    = CURRENT_TIMESTAMP;
+--SET OutputRoot.Properties.CodedCharSetId 	= 819;
+
+
+RETURN true;
+END;
+CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE DumpMessage_Truncate
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		--- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+
+

@@ -1,0 +1,387 @@
+
+CREATE COMPUTE MODULE "InputProcessingSOAP_PrepareExpiryMsg"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+SET OutputRoot = InputRoot;
+
+SET OutputRoot.MQMD.Format          	= 'MQSTR   ';
+SET OutputRoot.MQMD.MsgType				= 8;
+SET OutputRoot.MQMD.Feedback			= 0;
+SET OutputRoot.Properties.MessageDomain = 'XMLNSC';
+SET OutputRoot.Properties.MessageFormat = 'XMLNSC';
+SET OutputRoot.Properties.MessageSet 	= '';
+SET OutputRoot.Properties.MessageType 	= '';
+
+SET OutputRoot.XMLNSC.EAIHeader.EAIRtrnCd	=	'999994';
+
+RETURN true;
+END;
+
+END MODULE;
+
+CREATE FILTER MODULE "InputProcessingSOAP_Expiry?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Root.MQMD.Feedback = MQFB_EXPIRATION;
+END;
+
+END MODULE;
+
+CREATE FILTER MODULE "InputProcessingSOAP_ByPassSR?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Environment.Variables.ByPassSR IS NOT NULL AND
+Environment.Variables.ByPassSR='Y';
+END;
+
+END MODULE;
+
+CREATE FILTER MODULE "InputProcessingSOAP_Report?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Root.MQMD.MsgType = MQMT_REPORT;
+END;
+
+END MODULE;
+
+CREATE FILTER MODULE "InputProcessingSOAP_FunctionAuthorizationRequired?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Environment.Variables.ByPassFA IS NULL or Environment.Variables.ByPassFA<>'Y';
+END;
+
+END MODULE;
+
+CREATE COMPUTE MODULE "InputProcessingSOAP_BLOBToXMLNSC"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+-- Old Code commented by Ahmed Shaaban.
+-- Old Code caused any XMLNSC attributes to be removed
+-- the new code fix this bug
+--SET OutputRoot = InputRoot;
+
+--SET OutputRoot.Properties.MessageDomain = 'XMLNSC';
+--SET OutputRoot.Properties.MessageFormat = 'XMLNSC';
+
+--SET Environment.Variables.Message = InputRoot.XMLNSC.*[1];  -- Remove Parent
+
+--SET OutputRoot.XMLNSC 				= Environment.Variables.Message.Body;
+--SET OutputRoot.XMLNSC.EAIHeader 	= Environment.Variables.Message.EAIHeader;
+--SET OutputRoot.XMLNSC.EAIHeader.UsrDfn	= InputRoot.XMLNSC.*.EAIHeader.UsrDfn;
+--SET Environment.Variables.Message = Null;
+
+
+	SET OutputRoot = InputRoot;
+	
+	SET OutputRoot.Properties.MessageDomain = 'XMLNSC';
+	SET OutputRoot.Properties.MessageFormat = 'XMLNSC';
+	
+	SET OutputRoot.XMLNSC.TEMP1 = InputRoot.XMLNSC.*[1];  -- Remove Parent
+	
+	SET OutputRoot.XMLNSC.TEMP2 				= OutputRoot.XMLNSC.TEMP1.Body;
+	SET OutputRoot.XMLNSC.TEMP2.EAIHeader 	= OutputRoot.XMLNSC.TEMP1.EAIHeader;
+	SET OutputRoot.XMLNSC.TEMP2.EAIHeader.UsrDfn	= InputRoot.XMLNSC.*.EAIHeader.UsrDfn;
+	SET OutputRoot.XMLNSC = OutputRoot.XMLNSC.TEMP2;
+
+RETURN true;
+END;
+
+END MODULE;
+
+CREATE COMPUTE MODULE "InputProcessingSOAP_SetInputAuditProperties"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+SET OutputRoot = InputRoot;
+
+RETURN true; 
+END;
+
+END MODULE;
+
+
+
+CREATE COMPUTE MODULE "InputProcessingSOAP_MRMToXMLNSC"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+DECLARE I INTEGER;
+SET I = 1;
+WHILE I < CARDINALITY(InputRoot.*[]) DO
+	SET OutputRoot.*[I] = InputRoot.*[I];
+	SET I=I+1;
+END WHILE;
+
+
+SET OutputRoot.Properties.MessageDomain = 'XMLNSC';
+SET OutputRoot.Properties.MessageFormat = 'XMLNSC';
+SET OutputRoot.XMLNSC = InputBody;
+RETURN true; 
+END;
+
+END MODULE;
+CREATE FILTER MODULE "InputProcessingSOAP_XMLNSC?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+SUBSTRING(Root.BLOB.BLOB FROM 1 FOR 1) = X'3C';
+END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE InputProcessingSOAP_Compute_Caching
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		
+		-- Overide Function Id in EAI Header
+		If COALESCE(InputRoot.XMLNSC.Ovrd_FunctnId,'') <> '' Then
+			Set OutputRoot.XMLNSC.EAIHeader.FunctnId = InputRoot.XMLNSC.Ovrd_FunctnId;
+		End If;
+		
+		-- Set performance measures timestamps
+		
+		DECLARE C_TIME CHARACTER;
+		SET C_TIME = SUBSTRING(CAST(CURRENT_TIMESTAMP AS CHAR) FROM 12);
+		SET C_TIME = SUBSTRING(C_TIME from 1 for length(C_TIME)-1);	
+		If Environment.Variables.Flow_Tp in ('EAI_REQ', 'EAI_REQ_RPLY') Then
+			-- Extract message put time
+			DECLARE PUT_TIME CHARACTER;
+			
+			
+			-- Fix by: Ahmed Shaaban
+			-- Problem: GMT Date is is less by one day when time is between 00:00am and 2:59:59 am
+--			Set PUT_TIME=	SUBSTRING(cast(InputRoot.MQMD.PutDate as char) from 7 for 10)
+--							||' '
+--							||SUBSTRING(cast(cast(InputRoot.MQMD.PutTime as TIMESTAMP) as char) from 7);
+							
+--			Set PUT_TIME = SUBSTRING(cast(cast(InputRoot.MQMD.PutTime as TIMESTAMP) as char) from 12);
+
+-- 			-- end of fix
+
+			Set Environment.Variables.AuditVars.Put_Tmstmp 	= C_TIME;
+
+
+			Set Environment.Variables.AuditVars.Tmstmp_1 	= C_TIME ;
+		Else
+			If Environment.Variables.Flow_Tp = 'EAI_RPLY' Then
+				Set Environment.Variables.AuditVars.Tmstmp_3 = C_TIME;
+			Else
+				Set Environment.Variables.Int_Start_Tmstmp =C_TIME ; -- Holding start time of intermediate message flow
+			End If;
+		End If;
+		
+		If Environment.Variables.AuditVars.PromotedTmstmp IS NOT NULL THEN
+			Set Environment.Variables.AuditVars.Tmstmp_x = COALESCE(Trim(Environment.Variables.AuditVars.Tmstmp_x),'')||Environment.Variables.AuditVars.PromotedTmstmp; 			
+		End If;
+					
+		-- Caching
+		
+		-- Caching EAI Header
+		SET Environment.Variables.EAIHeader = OutputRoot.XMLNSC.EAIHeader;
+		-- Cash context information in case flow type is 'EAI_REQ'
+		IF (Environment.Variables.Flow_Tp = 'EAI_REQ') THEN
+			SET Environment.Variables.ContextInfo.ReplyToQ 			= OutputRoot.MQMD.ReplyToQ;
+			SET Environment.Variables.ContextInfo.ReplyToQMgr 		= OutputRoot.MQMD.ReplyToQMgr;
+			SET Environment.Variables.ContextInfo.Encoding 			= OutputRoot.MQMD.Encoding;
+			SET Environment.Variables.ContextInfo.CodedCharSetId	= OutputRoot.MQMD.CodedCharSetId;
+			SET Environment.Variables.ContextInfo.Priority			= OutputRoot.MQMD.Priority;
+			SET Environment.Variables.ContextInfo.Rqstr_Info_1 = OutputRoot.XMLNSC.EAIHeader.Rqstr_Info1;
+			SET Environment.Variables.ContextInfo.Rqstr_Info_2 = OutputRoot.XMLNSC.EAIHeader.Rqstr_Info2;
+			SET Environment.Variables.ContextInfo.Rqstr_Info_3 = OutputRoot.XMLNSC.EAIHeader.Rqstr_Info3;
+			SET Environment.Variables.ContextInfo.Rqstr_Info_4 = OutputRoot.XMLNSC.EAIHeader.Rqstr_Info4;
+			--SET Environment.Variables.ContextInfo.Trx_Md	   = OutputRoot.XMLNSC.EAIHeader.Trx_Md;
+			SET Environment.Variables.ContextInfo.Usr_Dfn_6	   = OutputRoot.XMLNSC.EAIHeader.UsrDfn;
+		END IF;
+		 
+		-- Correlating the Message
+		IF Environment.Variables.Flow_Tp In('EAI_RPLY','EAI_INT_REQ') THEN
+			IF OutputRoot.MQMD.CorrelId <> X'000000000000000000000000000000000000000000000000' THEN
+				Set OutputRoot.MQMD.MsgId = OutputRoot.MQMD.CorrelId;
+			Else
+				If COALESCE(Trim(InputRoot.XMLNSC.GL_Rply_Header.Correlate_Msg_Id),'') <>'' Then
+					Set OutputRoot.MQMD.MsgId = Cast(substring(InputRoot.XMLNSC.GL_Rply_Header.Correlate_Msg_Id from 1 for 48) as blob);
+				End If;
+			END IF;
+			-- Bypass Function Authorization
+			If Environment.Variables.ByPassFA is null Then
+				Set Environment.Variables.ByPassFA = 'Y';
+			End If; 
+		END IF;
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE FILTER MODULE InputProcessingSOAP_DumpRequired
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		set Environment.Variables.Dump_Msg_Tp = 'REQ';
+		return 
+		Environment.Variables.FlowProperties.Dump_Flg is not null
+		AND UPPER(Environment.Variables.FlowProperties.Dump_Flg) in ( 'Q','A')
+		AND Root.MQMD.BackoutCount = 0;
+	END;
+
+END MODULE;
+
+
+
+
+
+
+
+
+CREATE COMPUTE MODULE InputProcessingSOAP_SetSOAPParameters
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+
+
+CREATE COMPUTE MODULE InputProcessingSOAP_DumpMessage_Truncate
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		--- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+
+
+CREATE COMPUTE MODULE InputProcessingSOAP_Remove_NameSpace_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+
+		SET Environment.SourceNamespace = FIELDNAMESPACE(InputRoot.XMLNSC.*[LAST]);
+		If Environment.SourceNamespace IS NOT NULL AND Trim(Environment.SourceNamespace) NOT IN ('','NONAMESPACE')Then
+			CALL CopyMessageHeaders();
+			-- Remove NameSapce from incoming message
+			DECLARE TargetNamespace NAMESPACE '';
+			DECLARE TargetSchemaLocation CHAR '';
+			SET Environment.TargetNamespace = TargetNamespace;
+			SET Environment.TargetSchemaLocation = TargetSchemaLocation;
+			-- The target namespace can be specified dynamically in the MQRFH2 header.  
+			-- The following logic checks whether the MQRFH2 contains this info;  if it does not, 
+			-- defaults are supplied in the message flow. 
+					
+			IF InputRoot.MQRFH2.usr.SourceNamespace IS NOT NULL THEN
+				IF InputRoot.MQRFH2.usr.SourceNamespace = 'NONAMESPACE' THEN
+					SET Environment.SourceNamespace = '';
+				ELSE	
+					SET Environment.SourceNamespace = InputRoot.MQRFH2.usr.SourceNamespace;
+				END IF;
+			END IF;	
+					
+			-- Make the output tree the same as the input tree.  
+			-- We will then walk the tree changing things as we go   
+			SET OutputRoot.XMLNSC = InputBody;
+			SET OutputRoot.XMLNSC.XmlDeclaration= NULL;
+			DECLARE Cursor1 REFERENCE TO OutputRoot.XMLNSC;
+			DECLARE Cursor2 REFERENCE TO Environment;
+			CALL WalkTree (Cursor1, Cursor2);
+		Else
+			CALL CopyEntireMessage();
+		End If;
+		RETURN TRUE;
+		
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE InputProcessingSOAP_SetMsgId_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+
+		CALL CopyEntireMessage();
+		
+		-- Creating MQMD, so can go through flow seamlessly
+		SET Environment.Variables.MQMD.MsgId		= 	InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		SET Environment.Variables.MQMD.MsgType 		= 	MQMT_REPLY;
+		SET Environment.Variables.MQMD.Version 		= 	MQMD_CURRENT_VERSION;
+		SET Environment.Variables.MQMD.BackoutCount = 	0;
+
+		SET OutputRoot.HTTPInputHeader 				= NULL;
+		
+		CREATE NEXTSIBLING OF OutputRoot.Properties domain 'MQMD';
+		SET OutputRoot.MQMD = Environment.Variables.MQMD;
+
+
+		-- Just to indicate, the request came as SOAP. This value is being checked in OutputProcessing to decide reply in MQ or SOAP 
+		SET Environment.Variables.SOAPBinding 	= 	'Y';
+
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

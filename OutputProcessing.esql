@@ -1,0 +1,560 @@
+
+-- ************************************************************************************ --
+-- Developer         : Alaa Ahmed												    --
+-- Date              : 27/06/2006													    --
+-- Version           : 1.00																--
+-- Implementation ID : 1.3															--
+-- Comments			 : Updated by Alaa ahmed on 08/08/2006																	--
+-- ************************************************************************************ --
+CREATE FILTER MODULE "OutputProcessing_Rollback?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Environment.Variables.Rollback IS NOT NULL 
+AND Environment.Variables.Rollback = 'Y';
+END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE "OutputProcessing_Post-Formatter"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+CALL CopyMessageHeaders(); 
+
+DECLARE Report_Options INTEGER;
+
+If Environment.Variables.Outgoing_Msg = 'S' Then
+	Set Environment.Variables.MsgProperties	= Environment.Variables.SuccessMsgProperties;
+Else
+	Set Environment.Variables.MsgProperties	= Environment.Variables.FailureMsgProperties;	
+End if;
+
+-- Set Expiry, Proirity and Persistence.
+
+Set OutputRoot.MQMD.Expiry 		= cast(Environment.Variables.MsgProperties.Expiry as integer);
+If Environment.Variables.MsgProperties.Priority = -1 Then
+	Set OutputRoot.MQMD.Priority = InputRoot.MQMD.Priority;
+Else
+	Set OutputRoot.MQMD.Priority = cast(Environment.Variables.MsgProperties.Priority as integer);
+End If;
+Set OutputRoot.MQMD.Persistence = cast(Environment.Variables.MsgProperties.Persistence as integer);
+
+-- Setting Report Options
+
+Set OutputRoot.MQMD.Format 	= 'MQSTR   ';
+Set OutputRoot.MQRFH2 		= NULL;
+SET Report_Options = MQRO_NONE;
+IF Environment.Variables.Flow_Tp in('EAI_REQ', 'EAI_INT_REQ')  THEN
+	IF SUBSTRING(Environment.Variables.MsgProperties.Report_Options FROM 1 FOR 1) = '1' THEN
+	    SET Report_Options = Report_Options + MQRO_COA;
+	END IF;
+	IF SUBSTRING(Environment.Variables.MsgProperties.Report_Options FROM 2 FOR 1) = '1' THEN
+    		SET Report_Options = Report_Options + MQRO_COD;
+	END IF;
+	IF SUBSTRING(Environment.Variables.MsgProperties.Report_Options FROM 3 FOR 1) = '1' THEN
+    		SET Report_Options = Report_Options + MQRO_EXPIRATION;
+	END IF;
+	IF SUBSTRING(Environment.Variables.MsgProperties.Report_Options FROM 4 FOR 1) = '1' THEN
+    		SET Report_Options = Report_Options + MQRO_PASS_MSG_ID;
+	END IF;
+END IF;
+
+SET OutputRoot.MQMD.Report = Report_Options;
+
+-- Set Message Format
+
+IF UPPER(Environment.Variables.MsgProperties.MessageDomain) = 'MRM' THEN
+	SET OutputRoot.Properties.MessageSet 	= Environment.Variables.MsgProperties.MessageSet;
+	SET OutputRoot.Properties.MessageType 	= Environment.Variables.MsgProperties.MessageType;
+	SET OutputRoot.Properties.MessageDomain = Environment.Variables.MsgProperties.MessageDomain;
+	SET OutputRoot.Properties.MessageFormat = Environment.Variables.MsgProperties.MessageFormat;
+ELSEIF UPPER(Environment.Variables.MsgProperties.MessageDomain) = 'XML' THEN
+	SET OutputRoot.Properties.MessageDomain = 'XMLNSC';
+ELSE
+	SET OutputRoot.Properties.MessageDomain = Environment.Variables.MsgProperties.MessageDomain;	
+END IF;
+
+-- Set DestinationList
+
+IF 	UPPER(Environment.Variables.MsgProperties.MsgType)='RPLY' 	AND 
+	COALESCE(TRIM(OutputRoot.MQMD.ReplyToQ), '') <> '' 	AND COALESCE(TRIM(OutputRoot.MQMD.ReplyToQMgr), '') <> '' 		 THEN
+	SET OutputDestinationList.Destination.MQDestinationList.DestinationData.queueManagerName 	= OutputRoot.MQMD.ReplyToQMgr;
+	SET OutputDestinationList.Destination.MQDestinationList.DestinationData.queueName 			= OutputRoot.MQMD.ReplyToQ;
+ELSE 
+	SET OutputDestinationList.Destination.MQDestinationList.DestinationData.queueManagerName = CASE Environment.Variables.MsgProperties.DefaultDestinationQMgr
+
+	WHEN 'NONE' THEN ' '
+	ELSE 
+	Environment.Variables.MsgProperties.DefaultDestinationQMgr
+	END;
+	
+	SET OutputDestinationList.Destination.MQDestinationList.DestinationData.queueName = Environment.Variables.MsgProperties.DefaultDestinationQ;
+END IF;
+
+-- Set Message Type
+IF UPPER(Environment.Variables.MsgProperties.MsgType) = 'REQ' THEN
+    SET OutputRoot.MQMD.MsgType = MQMT_REQUEST;
+ELSE
+    IF UPPER(Environment.Variables.MsgProperties.MsgType) = 'RPLY' THEN
+        SET OutputRoot.MQMD.MsgType = MQMT_REPLY;
+        SET OutputRoot.MQMD.CorrelId = InputRoot.MQMD.MsgId; -- Set the correlid
+    ELSE
+        IF UPPER(Environment.Variables.MsgProperties.MsgType) = 'DTGM' THEN
+            SET OutputRoot.MQMD.MsgType = MQMT_DATAGRAM;
+        END IF; 
+    END IF;
+END IF;
+
+-- Set ReplytoQ and ReplytoQMgr
+IF COALESCE(TRIM(Environment.Variables.MsgProperties.DefaultReplyToQ), '') <> '' --AND COALESCE(TRIM(Environment.Variables.MsgProperties.DefaultReplyToQMgr), '7u') <> '7u'
+THEN
+	SET OutputRoot.MQMD.ReplyToQMgr = Environment.Variables.MsgProperties.DefaultReplyToQMgr;
+	SET OutputRoot.MQMD.ReplyToQ 	= Environment.Variables.MsgProperties.DefaultReplyToQ;
+END IF;
+
+-- Set Encoding and CCSID 
+SET OutputRoot.MQMD.Encoding 		= cast(Environment.Variables.MsgProperties.Encoding as integer);
+SET OutputRoot.MQMD.CodedCharSetId 	= cast(Environment.Variables.MsgProperties.CodedCharSetId as integer);
+
+IF Environment.Variables.DestinationSystem IS NULL THEN
+	IF Environment.Variables.MsgProperties.MessageDomain = 'XML'  THEN                                                               
+	   SET OutputRoot.XMLNSC.EAIMessage.EAIHeader 			 = InputBody.EAIHeader;
+	   SET OutputRoot.XMLNSC.EAIMessage.EAIHeader.MsgFrmt	 = Environment.Variables.MsgProperties.MessageType;
+	   If CARDINALITY(InputRoot.XMLNSC.*[]) > 1 Then
+		   SET OutputRoot.XMLNSC.EAIMessage.Body 				= InputBody;
+		   SET OutputRoot.XMLNSC.EAIMessage.Body.EAIHeader 	= NULL;
+	   End If;
+	ELSE                                                                                                                                           
+	   SET OutputRoot.MRM = InputBody;
+	END IF;
+ELSEIF Environment.Variables.DestinationSystem = 'FIX'THEN ---- FIX Message protocol
+	SET OutputRoot.XMLNSC = NULL;
+	SET OutputRoot.MRM.Header = InputRoot.MRM.Header;
+	SET OutputRoot.MRM.Body   = InputRoot.MRM.Body;
+	SET OutputRoot.MRM.Trailer= InputRoot.MRM.Trailer;
+ELSE	
+	SET OutputRoot.XMLNSC	= InputBody;
+	SET OutputRoot.XMLNSC.*.EAIHeader 	= NULL;
+END IF;
+
+
+
+RETURN true;
+END;
+
+CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+END;
+CREATE PROCEDURE CopyEntireMessage() BEGIN
+	SET OutputRoot = InputRoot;
+END;
+	
+END MODULE;
+
+CREATE FILTER MODULE "OutputProcessing_XMLNSC?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Root.XMLNSC IS NOT NULL
+AND Environment.Variables.MsgProperties.XMLNSCEncoding = 'Y'
+AND Environment.Variables.MsgProperties.XMLNSCEncoding is not null;
+END;
+
+END MODULE;
+
+CREATE COMPUTE MODULE OutputProcessing_PrepareNotificationMsg
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+DECLARE I INTEGER;
+SET I = 1;
+WHILE I < CARDINALITY(InputRoot.*[]) DO
+	SET OutputRoot.*[I] = InputRoot.*[I];
+	SET I=I+1;
+END WHILE;
+
+-- Format Notification Message
+SET OutputRoot.XMLNSC.EAIMessage.EAIHeader 		= InputRoot.XMLNSC.EAIHeader;
+SET OutputRoot.XMLNSC.EAIMessage.Notification_Md	= Environment.Variables.FlowProperties.Notification_Md;
+SET OutputRoot.XMLNSC.EAIMessage.Amount 			= InputRoot.XMLNSC.Amount;
+-- add here other required fields
+ 
+RETURN true;
+END;
+
+END MODULE;
+CREATE FILTER MODULE "OutputProcessing_NotificationRequired?"
+CREATE FUNCTION main() RETURNS BOOLEAN BEGIN
+RETURN 
+Environment.Variables.FlowProperties.Notification_Md <> '0' 
+AND Environment.Variables.FlowProperties.Notification_Md IS NOT NULL;
+END;
+
+END MODULE;
+
+
+
+
+CREATE COMPUTE MODULE OutputProcessing_Compute_SetXMLNSCEncoding
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		
+		--SET OutputRoot.XMLNSC.(XMLNSC.XMLNSCDecl).(XMLNSC."Encoding") 	= 'ISO-8859-6';
+		--SET OutputRoot.XMLNSC.(XMLNSC.XMLNSCDecl).(XMLNSC.Version) 		= '1.0';
+		
+		SET OutputRoot.XMLNSC.(XMLNSC.XmlDeclaration)*.(XMLNSC.Attribute)Encoding = 'ISO-8859-6';
+		SET OutputRoot.XMLNSC.(XMLNSC.XmlDeclaration)*.(XMLNSC.Attribute)Version = '1.0';	
+		
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE FILTER MODULE OutputProcessing_DumpRequired
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		set Environment.Variables.Dump_Msg_Tp = 'RPLY';
+		RETURN 
+		Environment.Variables.FlowProperties.Dump_Flg is not null
+		AND UPPER(Environment.Variables.FlowProperties.Dump_Flg) in ( 'P','A')
+		AND (Environment.Variables.Rollback IS NULL OR Environment.Variables.Rollback <> 'Y')
+		AND Root.MQMD.BackoutCount = 0;
+	END;
+
+END MODULE;
+
+
+CREATE FILTER MODULE "OutputProcessing_Filter_AuditRequired?"
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		RETURN Environment.Variables.FlowProperties.Audit_Flg ='1' AND
+		(Environment.Variables.ByPassSW IS NULL OR Environment.Variables.ByPassSW='N');
+	END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE OutputProcessing_Compute_PrepareAuditMsg
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		--CALL CopyMessageHeaders();
+		-- CALL CopyEntireMessage();
+				
+		-- Set performance measures timestamps
+
+--		DECLARE C_TIME CHARACTER;
+--		SET C_TIME = SUBSTRING(CAST(CURRENT_TIMESTAMP AS CHAR) FROM 12);
+--		SET C_TIME = SUBSTRING(C_TIME from 1 for length(C_TIME)-1);
+--		
+--		If Environment.Variables.Flow_Tp = 'EAI_REQ' Then
+--			If Environment.Variables.Outgoing_Msg = 'S' Then
+--				Set Environment.Variables.AuditVars.Tmstmp_2 = C_TIME ;
+--			Else
+--				Set Environment.Variables.AuditVars.Tmstmp_4 = C_TIME ;
+--			End If;
+--		Else
+--			If Environment.Variables.Flow_Tp in ( 'EAI_RPLY', 'EAI_REQ_RPLY') Then
+--				Set Environment.Variables.AuditVars.Tmstmp_4 = C_TIME;
+--			Else
+--			Set Environment.Variables.AuditVars.Tmstmp_x = COALESCE(Trim(Environment.Variables.AuditVars.Tmstmp_x),'')||
+--																			Environment.Variables.FlowProperties.Flow_Stage||
+--																			Environment.Variables.Int_Start_Tmstmp;
+--			Set Environment.Variables.AuditVars.Tmstmp_x = Environment.Variables.AuditVars.Tmstmp_x||C_TIME;
+--			End If;
+--		End If;
+		SET OutputRoot.Properties.CodedCharSetId 	= Environment.Variables.MsgProperties.CodedCharSetId;--InputRoot.Properties.CodedCharSetId;
+		SET OutputRoot.Properties.Encoding 			= Environment.Variables.MsgProperties.Encoding;--InputRoot.Properties.Encoding;
+		SET OutputRoot.MQMD.CodedCharSetId 	= Environment.Variables.MsgProperties.CodedCharSetId;--InputRoot.MQMD.CodedCharSetId;
+		SET OutputRoot.MQMD.Encoding 			= Environment.Variables.MsgProperties.Encoding;--InputRoot.MQMD.Encoding;
+		
+		SET OutputRoot.MQMD.Format      = InputRoot.MQMD.Format;
+		SET OutputRoot.MQMD.MsgId       = InputRoot.MQMD.MsgId;     
+		SET OutputRoot.MQMD.ReplyToQMgr 			= '';
+		SET OutputRoot.MQMD.Expiry 		=	-1; -- unlimited
+		SET OutputRoot.MQMD.Persistence =	MQPER_PERSISTENCE_AS_Q_DEF;
+		SET OutputRoot.MQMD.Priority	=	MQPRI_PRIORITY_AS_Q_DEF;
+		SET OutputRoot.MQMD.Report		=	MQRO_NONE;
+		SET OutputRoot.MQMD.Feedback	= 	0;
+		SET OutputRoot.XMLNSC.EAIMessage 						= Environment.Variables;
+		IF Environment.Variables.MqGetProcessing IS NULL OR Environment.Variables.MqGetProcessing <> 'Y' THEN
+			SET OutputRoot.XMLNSC.EAIMessage.EAIHeader.EAIRtrnCd 	= InputRoot.XMLNSC.EAIHeader.EAIRtrnCd;
+		ELSE
+			SET OutputRoot.XMLNSC.EAIMessage.EAIHeader.EAIRtrnCd 	= Environment.Variables.EAIHeader.EAIRtrnCd ;
+		END IF;	
+		--SET OutputRoot.MQMD.Report		=	MQRO_NONE;
+		--SET OutputRoot.MQMD.Feedback	= 	0;
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE FILTER MODULE OutputProcessing_ByPassRplyMsg 
+	CREATE FUNCTION  Main() RETURNS BOOLEAN
+	BEGIN
+		Return Environment.Variables.ByPassRplyMsg is not null
+		AND COALESCE (UPPER(Environment.Variables.ByPassRplyMsg),'') ='Y';
+	END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE OutputProcessing_DumpMessage_Truncate
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE OutputProcessing_Formatter
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE SingleWrite_SetOutputAuditingParameters
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE OutputProcessing_SetTimestmp
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		--SET Return Code to be used in Flow Auditing in previous output processing node in case of using MQGet Processing
+		SET Environment.Variables.EAIHeader.EAIRtrnCd                = InputRoot.XMLNSC.EAIMessage.EAIHeader.EAIRtrnCd;  	 
+		IF Environment.Variables.ByPassSW IS NULL OR Environment.Variables.ByPassSW = 'N' THEN
+			DECLARE C_TIME CHARACTER;
+			SET C_TIME = SUBSTRING(CAST(CURRENT_TIMESTAMP AS CHAR) FROM 12);
+			SET C_TIME = SUBSTRING(C_TIME from 1 for length(C_TIME)-1);
+		
+			If Environment.Variables.Flow_Tp = 'EAI_REQ' Then
+				If Environment.Variables.Outgoing_Msg = 'S' Then
+					Set Environment.Variables.AuditVars.Tmstmp_2 = C_TIME ;
+				Else
+					Set Environment.Variables.AuditVars.Tmstmp_4 = C_TIME ;
+				End If;
+			Else
+				If Environment.Variables.Flow_Tp in ( 'EAI_RPLY', 'EAI_REQ_RPLY') Then
+					IF Environment.Variables.Int_Start_Tmstmp IS NOT NULL AND Environment.Variables.Int_Start_Tmstmp <> '' THEN
+						Set Environment.Variables.AuditVars.Tmstmp_3 = Environment.Variables.Int_Start_Tmstmp;
+					END IF;	
+					Set Environment.Variables.AuditVars.Tmstmp_4 = C_TIME;
+				Else
+					Set Environment.Variables.AuditVars.Tmstmp_x = COALESCE(Trim(Environment.Variables.AuditVars.Tmstmp_x),'')||
+																			Environment.Variables.FlowProperties.Flow_Stage||
+																			Environment.Variables.Int_Start_Tmstmp;
+					Set Environment.Variables.AuditVars.Tmstmp_x = Environment.Variables.AuditVars.Tmstmp_x||C_TIME;
+				End If;
+			End If;	
+		END IF;	
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE FILTER MODULE OutputProcessing_FIX_Messages
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		RETURN Environment.Variables.DestinationSystem IS NOT NULL AND Environment.Variables.DestinationSystem = 'FIX';
+	END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE OutputProcessing_Add_NS_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+
+		DECLARE SourceNamespace NAMESPACE '';
+		CALL CopyMessageHeaders();			
+
+		SET Environment.SourceNamespace = SourceNamespace;
+		SET Environment.TargetNamespace = Environment.Variables.TargetNS;
+		SET Environment.TargetSchemaLocation = Environment.Variables.TargetSL;
+		IF InputRoot.MQRFH2.usr.SourceNamespace IS NOT NULL THEN
+			SET Environment.SourceNamespace = InputRoot.MQRFH2.usr.SourceNamespace;
+		END IF;
+		-- The target namespace can be specified dynamically in the MQRFH2 header.
+		-- The following logic checks whether the MQRFH2 contains this info; if it does not,
+		-- defaults are supplied in the message flow.					
+
+		IF InputRoot.MQRFH2.usr.TargetNamespace IS NOT NULL THEN
+			SET Environment.TargetNamespace = InputRoot.MQRFH2.usr.TargetNamespace;
+		END IF;					
+
+		IF InputRoot.MQRFH2.usr.TargetSchemaLocation IS NOT NULL THEN
+			IF InputRoot.MQRFH2.usr.TargetSchemaLocation = 'NONAMESPACE' THEN
+				SET Environment.TargetSchemaLocation = '';
+			ELSE
+				SET Environment.TargetSchemaLocation = InputRoot.MQRFH2.usr.TargetSchemaLocation;
+			END IF;
+		END IF;					
+		-- Make the output tree the same as the input tree.
+		SET OutputRoot.XMLNSC.{Environment.Variables.ParentRplyTag} = InputBody;
+		-- Removing EAIMessage from inside OutputRoot.XMLNSC.{Environment.Variables.ParentRplyTag}
+		SET OutputRoot.XMLNSC.{Environment.Variables.ParentRplyTag} = OutputRoot.XMLNSC.{Environment.Variables.ParentRplyTag}.EAIMessage;
+		-- check if namespace is required for the parent tag
+		IF (Environment.Variables.ParentRplyTagNS IS NOT NULL AND Environment.Variables.ParentRplyTagNS <> '') THEN
+			SET OutputRoot.XMLNSC.{Environment.Variables.ParentRplyTag} NAMESPACE = Environment.Variables.ParentRplyTagNS;
+		END IF;
+		
+		-- We will then walk the tree changing things as we go
+		DECLARE Cursor1 REFERENCE TO OutputRoot.XMLNSC;
+		DECLARE Cursor2 REFERENCE TO Environment;
+		CALL WalkTree (Cursor1, Cursor2);			
+
+		--SET OutputRoot.XMLNSC.(XML.Element)*[1].(XMLNSC.NamespaceDecl)xmlns=Environment.TargetNamespace;
+		
+		RETURN TRUE;
+
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
+
+
+CREATE FILTER MODULE OutputProcessing_SOAP_Reply_Filter
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		RETURN Environment.Variables.MsgProperties.MsgType IN ('RPLY','') AND
+		(Environment.Variables.SOAPBinding IS NOT NULL AND UPPER(Environment.Variables.SOAPBinding) ='Y');
+	END;
+
+END MODULE;
+
+
+CREATE COMPUTE MODULE OutputProcessing_SetReplyIdentifier_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+
+		CALL CopyEntireMessage();		
+
+		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = InputRoot.MQMD.MsgId;
+
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
